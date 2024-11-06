@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function POST(req: {
-  json: () => PromiseLike<{ email: string; password: string; name: string }>;
-}) {
+export async function POST(req: NextRequest) {
   try {
     const { email, password, name } = await req.json();
     const user = await prisma.user.findUnique({

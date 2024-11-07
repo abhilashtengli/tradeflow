@@ -32,9 +32,6 @@ const Login = () => {
     if (res?.error) {
       setError(res.error);
     } else {
-      // Redirect or handle successful login
-      // You can redirect to a protected page or show a success message
-    
        redirect("/dashboard")
     }
   };

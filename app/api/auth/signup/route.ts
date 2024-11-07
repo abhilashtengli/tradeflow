@@ -1,19 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name } = await req.json();
+    const { email, password, name, role } = await req.json();
     const user = await prisma.user.findUnique({
       where: {
         email: email
       }
     });
     if (user) {
-      return Response.json(
+      return NextResponse.json(
         {
           message: "User already exists"
         },
@@ -30,18 +30,18 @@ export async function POST(req: NextRequest) {
         email,
         password: hashPassword,
         name,
-        role: "Buyer"
+        role
       }
     });
-    return Response.json({
+    return NextResponse.json({
       message: "User created successfully",
       user: newUser
     });
   } catch (err) {
     console.error("Error creating user:", err);
-    return Response.json({
-      message: "Error creating user " + err,
-      status: 500
-    });
+    return NextResponse.json(
+      { message: "Error creating user " + err },
+      { status: 500 }
+    );
   }
 }

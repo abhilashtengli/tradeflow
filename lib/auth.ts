@@ -25,6 +25,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async credentials => {
         const { email, password } = credentials;
+        console.log(email, "Signing in...");
+        
 
         const user = await prisma.user.findUnique({
           where: {
@@ -46,5 +48,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { id: user.id.toString(), name: user.name, email: user.email };
       }
     })
-  ]
+  ],
+  callbacks: {
+    async session({ session, token }) {
+      session.user.id = token.sub ?? "";
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+  },
 });

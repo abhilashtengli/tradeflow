@@ -13,13 +13,18 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
+import { signIn } from "next-auth/react";
+import {  useRouter } from "next/navigation";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("buyer");
-  const handleSubmit = async () => {
+  const [role, setRole] = useState("Buyer");
+  const router = useRouter();
+
+  const handleSubmit = async (e: { preventDefault: () => void; }  ) => {
+     e.preventDefault();
     const userData = {
       name,
       email,
@@ -28,10 +33,23 @@ const Signup = () => {
     };
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const res = await axios.post(
-        "/api/auth/signup",
-        userData
-      );
+      await axios.post("/api/auth/signup", userData);
+
+      console.log("signup successful");
+
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password
+      });
+      console.log("signin.....");
+
+      if (res?.ok) {
+        console.log("okkk.");
+        router.push("/dashboard");
+      } else {
+        console.log("Error signing in after signup:", res?.error);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -49,30 +67,30 @@ const Signup = () => {
             <Input
               placeholder="Name"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
             />
             <Input
               placeholder="Email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <Input
               placeholder="Password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <div className="flex flex-col ">
               <select
                 id="role"
                 name="role"
                 value={role}
-                onChange={e => setRole(e.target.value)}
+                onChange={(e) => setRole(e.target.value)}
                 className="border p-2 rounded-md"
               >
-                <option value="buyer">Buyer</option>
-                <option value="seller">Seller</option>
+                <option value="Buyer">Buyer</option>
+                <option value="Seller">Seller</option>
               </select>
-            </div>
+             </div>
             <Button
               //   onClick={handleSubmit}
               type="submit"

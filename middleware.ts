@@ -2,18 +2,52 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const protectedRoutes = ["/api/user", "api/user:id"];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // Define public paths
   const isPublicPath = path === "/signin" || path === "/signup";
 
-  // Fetch token using next-auth's getToken helper
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET
   });
+
+  const userId = token?.userId as string;
+
+  if (
+    protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+  ) {
+    if (!token && !userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    });
+    if (!user) {
+      return NextResponse.json(
+        {
+          message: "User not found"
+        },
+        { status: 404 }
+      );
+    }
+    const response = NextResponse.next();
+
+    // Add user data to response headers (this will be available in the downstream API or page)
+    response.headers.set("x-user-id", user.id);
+    response.headers.set("x-user-name", user.name);
+    response.headers.set("x-user-email", user.email);
+
+    return response;
+  }
 
   // Redirect logged-in users away from /signin or /signup to /dashboard
   if (isPublicPath && token) {

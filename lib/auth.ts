@@ -45,13 +45,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isPasswordValid) {
           throw new Error("Invalid password");
         }
-        return { id: user.id.toString(), name: user.name, email: user.email };
+        return { id: user.id, name: user.name, email: user.email };
       }
     })
   ],
   callbacks: {
     async session({ session, token }) {
-      session.user.id = token.sub ?? "";
+      if (token && session.user) {
+        session.user.id = token.sub ?? token.id as string;
+      }
       return session;
     },
     async jwt({ token, user }) {
@@ -62,33 +64,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
   },
+  secret: process.env.AUTH_SECRET,
 });
-
-// import { NextRequest, NextResponse } from "next/server";
-
-// export function middleware(request: NextRequest) {
-//   const path = request.nextUrl.pathname;
-//   const token = request.cookies.get("token")?.value || "";
-
-//   // Define public paths
-//   const isPublicPath = path === "/signin" || path === "/signup";
-
-//   // Redirect logged-in users away from /signin or /signup to /dashboard
-//   if (isPublicPath && token) {
-//     return NextResponse.redirect(new URL("/dashboard", request.url));
-//   }
-
-//   // Redirect to /signin if trying to access protected route without a token
-//   if (!isPublicPath) {
-//     // Prevent further redirects if already on /signin
-//     if (path !== "/signin") {
-//       return NextResponse.redirect(new URL("/signin", request.url));
-//     }
-//   }
-
-//   return NextResponse.next();
-// }
-
-// export const config = {
-//   matcher: ["/dashboard","/admin/:path*"]
-// };

@@ -7,7 +7,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const id = params.id;
+  // Await params to properly handle async dynamic params in Next.js
+  const { id } = await params;
 
   try {
     const user = await prisma.user.findUnique({
@@ -23,15 +24,10 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json(
-        {
-          message: "User not found"
-        },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ user: user }, { status: 200 });
+    return NextResponse.json({ user }, { status: 200 });
   } catch (err) {
     return NextResponse.json({
       error: err,

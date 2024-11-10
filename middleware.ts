@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const protectedRoutes = ["/api/user", "api/user:id"];
+const protectedRoutes = ["/api/user"];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -18,35 +18,43 @@ export async function middleware(request: NextRequest) {
     secret: process.env.AUTH_SECRET
   });
 
-  const userId = token?.userId as string;
-
-  if (
-    protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
-  ) {
-    if (!token && !userId) {
+  if (!token) {
+    if (protectedRoutes.some((route) => path.startsWith(route))) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId
+  }
+  if (token) {
+    const userId = token?.userId as string;
+    if (
+      protectedRoutes.some((route) =>
+        request.nextUrl.pathname.startsWith(route)
+      )
+    ) {
+      if (!token && !userId) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
-    });
-    if (!user) {
-      return NextResponse.json(
-        {
-          message: "User not found"
-        },
-        { status: 404 }
-      );
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId
+        }
+      });
+      if (!user) {
+        return NextResponse.json(
+          {
+            message: "User not found"
+          },
+          { status: 404 }
+        );
+      }
+      const response = NextResponse.next();
+
+      // Add user data to response headers (this will be available in the downstream API or page)
+      response.headers.set("x-user-id", user.id);
+      response.headers.set("x-user-name", user.name);
+      response.headers.set("x-user-email", user.email);
+
+      return response;
     }
-    const response = NextResponse.next();
-
-    // Add user data to response headers (this will be available in the downstream API or page)
-    response.headers.set("x-user-id", user.id);
-    response.headers.set("x-user-name", user.name);
-    response.headers.set("x-user-email", user.email);
-
-    return response;
   }
 
   // Redirect logged-in users away from /signin or /signup to /dashboard
@@ -65,5 +73,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard", "/admin/:path*"]
+  matcher: ["/dashboard", "/admin/:path*","/api/user/:path*"]
 };

@@ -2,19 +2,9 @@
 
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { CreateProduct } from "./productValidation/route";
 
 const prisma = new PrismaClient();
-
-const CreateProduct = z.object({
-  name: z.string().min(3),
-  description: z.string(),
-  category: z.string(),
-  quantity: z.number().int().positive().min(0),
-  price: z.number().positive(),
-  country: z.string(),
-  isAvailable: z.boolean()
-});
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,18 +42,51 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   try {
-    const body = await request.json();
+    const { id } = await request.json();
 
-    const { success } = CreateProduct.safeParse(body);
-
-    if (!success) {
-      return NextResponse.json({
-        message: "Invalid parameters given"
-      });
+    const product = await prisma.product.findUnique({
+      where: {
+        id: id
+      }
+    });
+    if (!product) {
+      return NextResponse.json(
+        {
+          message: "No product found"
+        },
+        { status: 400 }
+      );
     }
+
+    await prisma.product.delete({
+      where: {
+        id: product.id
+      }
+    });
+    return NextResponse.json({
+      message: "Product deleted successfully"
+    });
   } catch (err) {
-    return NextResponse.json({ error: err });
+    return NextResponse.json({
+      error: err
+    });
+  }
+}
+
+//Get all products
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(request: NextRequest) {
+  try {
+    const products = await prisma.product.findMany();
+
+    return NextResponse.json({
+      products: products
+    });
+  } catch (err) {
+    return NextResponse.json({
+      error: err
+    });
   }
 }

@@ -20,9 +20,23 @@ name String
 email String @unique
 password String
 role Role
+country String     @default("India") 
 product Product[]
+transportation Transportation[] 
 createdAt  DateTime @default(now())
 updatedAt  DateTime @updatedAt
+}
+
+model UserTransporter {
+  id String @id @default(uuid())
+  name String
+  email String
+  password String
+  role String  @default("transporter")
+  companyName String
+  country String
+  transportation Transportation[] 
+  companyAddres  String
 }
 
 model Product{
@@ -44,4 +58,21 @@ model Product{
 enum Role {
   Buyer
   Seller
+}
+
+model Transportation {
+  id             String       @id @default(uuid())
+  type           String    // e.g., "Truck", "Rail", "Air"
+  origin         String    // Pickup location
+  destination    String    // Port or destination location
+  distance       String
+  price          Float
+  user           User      @relation(fields: [userId], references: [id])
+  userId         String       // Foreign key to track which user booked the transport
+  transporter    UserTransporter   @relation( fields: [transporterId], references: [id])
+  transporterId  String
+  dispatched     Boolean
+  delivered      Boolean
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }

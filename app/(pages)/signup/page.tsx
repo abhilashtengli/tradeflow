@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import {
@@ -15,12 +16,15 @@ import { useState } from "react";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import {  useRouter } from "next/navigation";
+import { NextResponse } from "next/server";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("Buyer");
+  const [isTransporter, setIsTransporter] = useState(true);
+  const [tp, setTp] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: { preventDefault: () => void; }  ) => {
@@ -55,7 +59,46 @@ const Signup = () => {
     }
   };
 
+  const handleSubmitTransporter = async () => {
+    const transporterdata = {
+      name,
+      email,
+      password,
+    }
+    try {
+      await axios.post("/api/auth/signup", transporterdata);
+      
+      console.log("signup successful");
+
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password
+      });
+      console.log("signin.....");
+
+      if (res?.ok) {
+        console.log("okkk.");
+       
+        router.push("/dashboard");
+      } else {
+        console.log("Error signing in after signup:", res?.error);
+      }
+      
+    } catch (err) {
+      return NextResponse.json({error: err});
+    }
+  }
+
+  const handleRedirect = () => {
+    setTp(true);
+    setIsTransporter(false)
+    router.push("/signup")
+  }
+
   return (
+  <>
+  { !isTransporter &&  
     <div className="flex justify-center items-center h-dvh">
       <Card>
         <CardHeader>
@@ -79,13 +122,13 @@ const Signup = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <div className="flex flex-col ">
+            <div className="flex flex-col">
               <select
                 id="role"
                 name="role"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="border p-2 rounded-md"
+                className="border p-2 rounded-md cursor-pointer"
               >
                 <option value="Buyer">Buyer</option>
                 <option value="Seller">Seller</option>
@@ -111,7 +154,66 @@ const Signup = () => {
           <Link href="/signin">Already have a account? Sign In</Link>
         </CardFooter>
       </Card>
-    </div>
+        </div>}
+      
+
+      {isTransporter && 
+      <div className="flex justify-center items-center h-dvh">
+          <Card>
+          { !tp && <div>
+              <h1 className="p-3">You want to Sign Up as a Transporter ?</h1>
+              <div className="flex  p-2 justify-between items-center px-7">
+                <button className="border px-4 py-1 rounded-lg " onClick={() => setTp(true)}>Yes</button>
+                <button className="border px-4 py-1 rounded-lg " onClick={handleRedirect}>No</button>
+              </div>
+            </div>}
+        {  tp &&   <div>
+        <CardHeader>
+          <CardTitle className="text-center">Sign Up</CardTitle>
+          <CardDescription />
+        </CardHeader>
+        <CardContent>
+             <form className="flex flex-col gap-3" onSubmit={() => {
+                
+          }}>
+            <Input
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <Input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            
+            <Button
+              type="submit"
+              variant="outline"
+              className="bg-black text-gray-300"
+            >
+              Sign Up
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-3">
+          <span>Or</span>
+          <form>
+            <Button variant="outline" type="submit">
+              Sign In with Google
+            </Button>
+          </form>
+          <Link href="/signin">Already have a account? Sign In</Link>
+              </CardFooter>
+              </div>}
+      </Card>
+        </div>}
+      </>
   );
 };
 

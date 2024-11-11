@@ -34,7 +34,7 @@ model Product{
   quantity    Int
   price       Float
   user        User      @relation(fields: [userId], references: [id])
-  userId      String @unique
+  userId      String 
   country     String    // Country of origin or where it's available
   isAvailable Boolean   @default(true)
   createdAt   DateTime  @default(now())

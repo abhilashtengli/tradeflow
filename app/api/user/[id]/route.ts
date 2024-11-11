@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
+//GetUserById
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

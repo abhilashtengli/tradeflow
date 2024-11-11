@@ -10,6 +10,7 @@ const userUpdate = z.object({
 });
 const prisma = new PrismaClient();
 
+//GetAll Users
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
@@ -26,6 +27,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+//Update Users
 export async function PATCH(request: NextRequest) {
   try {
     const userId = request.headers.get("x-user-id") as string;

@@ -51,3 +51,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: err });
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const { success } = CreateProduct.safeParse(body);
+
+    if (!success) {
+      return NextResponse.json({
+        message: "Invalid parameters given"
+      });
+    }
+  } catch (err) {
+    return NextResponse.json({ error: err });
+  }
+}

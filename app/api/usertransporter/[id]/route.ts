@@ -5,14 +5,21 @@ import { json } from "stream/consumers";
 const prisma = new PrismaClient();
 export async function GET(
   request: NextRequest,
-  { params }: { params: { email: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { email } = await params;
+    const { id } = await params;
 
     const user = await prisma.userTransporter.findUnique({
       where: {
-        email: email
+        id: id
+      },
+      select: {
+        name: true,
+        email: true,
+        companyName: true,
+        companyAddres: true,
+        role: true
       }
     });
     if (!user) {

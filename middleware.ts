@@ -26,11 +26,7 @@ export async function middleware(request: NextRequest) {
   }
   if (token) {
     const userId = token?.userId as string;
-    if (
-      protectedRoutes.some((route) =>
-        request.nextUrl.pathname.startsWith(route)
-      )
-    ) {
+    if (protectedRoutes.some((route) =>request.nextUrl.pathname.startsWith(route))) {
       if (!token && !userId) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
       }
@@ -39,7 +35,12 @@ export async function middleware(request: NextRequest) {
           id: userId
         }
       });
-      if (!user) {
+      const userTs = await prisma.userTransporter.findUnique({
+        where: {
+          id: userId
+        }
+      });
+      if (!user && !userTs) {
         return NextResponse.json(
           {
             message: "User not found"
@@ -50,9 +51,16 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.next();
 
       // Add user data to response headers (this will be available in the downstream API or page)
-      response.headers.set("x-user-id", user.id);
-      response.headers.set("x-user-name", user.name);
-      response.headers.set("x-user-email", user.email);
+      if (user) {
+        response.headers.set("x-user-id", user.id);
+        response.headers.set("x-user-name", user.name);
+        response.headers.set("x-user-email", user.email);
+      }
+      if (userTs) {
+        response.headers.set("x-user-id", userTs.id);
+        response.headers.set("x-user-name", userTs.name);
+        response.headers.set("x-user-email", userTs.email);
+      }
 
       return response;
     }

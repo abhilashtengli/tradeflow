@@ -14,8 +14,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
+import axios from "axios";
 const Login = () => {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -26,13 +26,19 @@ const Login = () => {
     const res = await signIn("credentials", {
       redirect: false,
       email,
-      password,
+      password
     });
+      const { data } = await axios.post("/api/getUserRole", { email });
+      const userRole = data.role;
 
     if (res?.error) {
       setError(res.error);
     } else {
-       redirect("/dashboard")
+      if (userRole === "Buyer" || userRole === "Seller") {
+        redirect("/dashboard");
+      } else if (userRole === "Transporter") {
+        redirect("/tsdashboard");
+      }
     }
   };
   return (
@@ -44,8 +50,14 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-            <Input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-            <Input placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
             <Button
               variant="outline"
               type="submit"

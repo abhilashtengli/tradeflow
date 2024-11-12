@@ -30,13 +30,13 @@ updatedAt  DateTime @updatedAt
 model UserTransporter {
   id String @id @default(uuid())
   name String
-  email String
+  email String @unique
   password String
   role String  @default("transporter")
-  companyName String
-  country String
+  companyName String?
+  country String?
   transportation Transportation[] 
-  companyAddres  String
+  companyAddres  String?
 }
 
 model Product{

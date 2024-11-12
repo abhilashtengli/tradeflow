@@ -24,21 +24,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
       },
       authorize: async credentials => {
-        const { email, password } = credentials;
-        console.log(email, "Signing in...");
+        const { email, password } = credentials;  
         
-
+        const userTs = await prisma.userTransporter.findUnique({
+          where: {
+            email: email as string
+          }
+        })
         const user = await prisma.user.findUnique({
           where: {
             email: email as string
           }
         });
-        {
-        }
-        if (!user) {
+        
+        if (!user && !userTs) {
           throw new CredentialsSignin("user is in valid");
         }
-        const isPasswordValid = await bcrypt.compare(
+
+        if (user) {
+          const isPasswordValid = await bcrypt.compare(
           password as string,
           user.password
         );
@@ -46,6 +50,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid password");
         }
         return { id: user.id, name: user.name, email: user.email };
+        }
+
+        if (userTs) {
+          const isPasswordValid = await bcrypt.compare(
+            password as string,
+            userTs.password
+          );
+            if (!isPasswordValid) {
+          throw new Error("Invalid password");
+          }
+          return { id: userTs.id, name: userTs.name, email: userTs.email };
+
+        }
+        return null;
       }
     })
   ],

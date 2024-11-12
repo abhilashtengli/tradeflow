@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     const distance = distanceData.distance.value; // Distance in meters
     const disInKms = distance / 1000;
-    const ratePerKm = 20;
+    const ratePerKm = 26;
     const price = disInKms * ratePerKm;
 
     const transportationData = await prisma.transportation.create({
@@ -54,6 +54,15 @@ export async function POST(request: NextRequest) {
         userId: body.userId,
         distance,
         price: price
+      },
+      select: {
+        id: true,
+        type: true,
+        origin: true,
+        destination: true,
+        load: true,
+        distance: true,
+        price: true
       }
     });
 
@@ -64,5 +73,22 @@ export async function POST(request: NextRequest) {
       { message: "Failed to calculate distance" },
       { status: 500 }
     );
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const userId = request.headers.get("x-user-id") as string;
+
+    const transportationData = await prisma.transportation.findMany({
+      where: {
+        userId: userId
+      }
+    });
+    return NextResponse.json({
+      data: transportationData
+    });
+  } catch (err) {
+    return NextResponse.json({ error: err });
   }
 }

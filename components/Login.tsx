@@ -52,10 +52,12 @@ const Login = () => {
           <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
             <Input
               placeholder="Email"
+              required
               onChange={(e) => setEmail(e.target.value)}
             />
             <Input
               placeholder="Password"
+              required
               onChange={(e) => setPassword(e.target.value)}
             />
             <Button

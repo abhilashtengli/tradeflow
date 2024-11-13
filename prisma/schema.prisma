@@ -83,6 +83,7 @@ model FreightForwarder {
   role            String    @default("FreightForwarder")
   email           String    @unique
   password        String
+  freightQuote    FreightQuote[]
   country         String?
   location        String?   // Based on country or region
   freightBookings   FreightBooking[]
@@ -91,20 +92,41 @@ model FreightForwarder {
 model FreightBooking {
   id                  String              @id @default(uuid())
   freightForwarder    FreightForwarder    @relation(fields: [freightForwarderId], references: [id])
-  freightForwarderId  String
+  freightForwarderId  String               @default("not yet accepted ")
   user                User                @relation(fields: [userId], references: [id])
   userId              String
-  containerType       ContainerType         
+  containerType       ContainerType   
+  noOfContainers      Int      
+  load                Int            //load in tons
   origin              String    
   destination         String 
+  freightQuote        FreightQuote[]
   departureDate       DateTime
-  arrivalDate         DateTime
-  status              String              @default("Pending")
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  price               Float?               
+  arrivalDate         DateTime?               @default(now())
+  accepted            Boolean                 @default(false)
+  userConfirm         confirmFreightBooking?            
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
 }  
 
+model FreightQuote  {
+  id                   String               @id @default(uuid()) 
+  freightForwarder     FreightForwarder     @relation(fields: [freightForwarderId], references: [id])
+  freightForwarderId   String 
+  freightBooking       FreightBooking       @relation(fields: [bookingId], references: [id])
+  bookingId            String
+  price                Float
+  isAccepted           Boolean?
+}
+
+
 enum ContainerType {
-  Type_20
+  Type_20 
   Type_40
+}
+
+enum confirmFreightBooking { 
+  accepted
+  rejected
 }

@@ -40,7 +40,12 @@ export async function middleware(request: NextRequest) {
           id: userId
         }
       });
-      if (!user && !userTs) {
+      const userFf = await prisma.freightForwarder.findUnique({
+        where: {
+          id: userId
+        }
+      });
+      if (!user || !userTs || !userFf) {
         return NextResponse.json(
           {
             message: "User not found"
@@ -60,6 +65,11 @@ export async function middleware(request: NextRequest) {
         response.headers.set("x-user-id", userTs.id);
         response.headers.set("x-user-name", userTs.name);
         response.headers.set("x-user-email", userTs.email);
+      }
+      if (userFf) {
+        response.headers.set("x-user-id", userFf.id);
+        response.headers.set("x-user-name", userFf.name);
+        response.headers.set("x-user-email", userFf.email);
       }
 
       return response;

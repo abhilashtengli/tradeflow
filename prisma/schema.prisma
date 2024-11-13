@@ -18,6 +18,7 @@ role Role
 country String     @default("India") 
 product Product[]
 transportation Transportation[] 
+freightBookings   FreightBooking[]
 createdAt  DateTime @default(now())
 updatedAt  DateTime @updatedAt
 }
@@ -36,7 +37,7 @@ model UserTransporter {
 
 model Product{
 
-  id          String       @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String
   category    String
@@ -72,4 +73,38 @@ model Transportation {
   delivered      Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+}
+
+model FreightForwarder {
+  id              String    @id @default(uuid())
+  name            String
+  companyName     String?
+  companyAddress  String?
+  role            String    @default("FreightForwarder")
+  email           String    @unique
+  password        String
+  country         String?
+  location        String?   // Based on country or region
+  freightBookings   FreightBooking[]
+}
+
+model FreightBooking {
+  id                  String              @id @default(uuid())
+  freightForwarder    FreightForwarder    @relation(fields: [freightForwarderId], references: [id])
+  freightForwarderId  String
+  user                User                @relation(fields: [userId], references: [id])
+  userId              String
+  containerType       ContainerType         
+  origin              String    
+  destination         String 
+  departureDate       DateTime
+  arrivalDate         DateTime
+  status              String              @default("Pending")
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+}  
+
+enum ContainerType {
+  Type_20
+  Type_40
 }

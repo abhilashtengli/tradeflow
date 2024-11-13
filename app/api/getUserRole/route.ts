@@ -21,4 +21,14 @@ export async function POST(request: NextRequest) {
     }
   });
   if (userTs) return NextResponse.json({ role: userTs.role || null });
+
+  const userFf = await prisma.freightForwarder.findUnique({
+    where: {
+      email
+    },
+    select: {
+      role: true
+    }
+  });
+  if(userFf) return NextResponse.json({ role: userFf.role || null });
 }

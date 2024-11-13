@@ -16,7 +16,6 @@ import { useState } from "react";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import {  useRouter } from "next/navigation";
-import { NextResponse } from "next/server";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -53,6 +52,8 @@ const Signup = () => {
           router.push("/dashboard");
         } else if (role === "Transporter") {
           router.push("/tsdashboard");
+        } else if (role === "FreightForwarder") {
+          router.push("/ffdashboard");
         }
       } else {
         console.log("Error signing in after signup:", res?.error);
@@ -102,7 +103,7 @@ const Signup = () => {
                 <option value="Buyer">Buyer</option>
                 <option value="Seller">Seller</option>
                 <option value="Transporter">Transporter</option>
-                <option value="FreightForwader">Freight Forwader</option>
+                <option value="FreightForwarder">Freight Forwader</option>
               </select>
              </div>
             <Button

@@ -21,7 +21,12 @@ export async function POST(req: NextRequest) {
           email: email
         }
       });
-      if (user && userTs) {
+      const userFf = await prisma.freightForwarder.findUnique({
+        where: {
+          email: email
+        }
+      });
+      if (user || userTs || userFf) {
         return NextResponse.json(
           { message: "User already exists with this email address" },
           { status: 400 }
@@ -50,7 +55,12 @@ export async function POST(req: NextRequest) {
           email: email
         }
       });
-      if (user && userTs) {
+      const userFf = await prisma.freightForwarder.findUnique({
+        where: {
+          email: email
+        }
+      });
+      if (user || userTs || userFf) {
         return NextResponse.json(
           { message: "User already exists with this email address" }
         ), { status: 400 };
@@ -64,7 +74,36 @@ export async function POST(req: NextRequest) {
         }
       });
       return NextResponse.json({ data: userData }, { status: 200 });
+    } else if (role === "FreightForwarder") {
+      const user = await prisma.userTransporter.findUnique({
+        where: {
+          email: email
+        }
+      });
+      const userTs = await prisma.userTransporter.findUnique({
+        where: {
+          email: email
+        }
+      });
+      const userFf = await prisma.freightForwarder.findUnique({
+        where: {
+          email: email
+        }
+      });
+      if (user || userTs || userFf) {
+        return NextResponse.json({ message: "User already exists with this email address" }), { status: 400 };
+      }
+      const userFfData = await prisma.freightForwarder.create({
+        data: {
+          email,
+          password: hashPassword,
+          name,
+          role
+        }
+      });
+      return NextResponse.json({ data: userFfData }, { status: 200 });
     }
+     return NextResponse.json({ message: "Invalid role specified" }, { status: 400 });
   } catch (err) {
     console.error("Error creating user:", err);
     return NextResponse.json(

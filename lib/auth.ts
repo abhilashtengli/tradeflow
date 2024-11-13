@@ -36,9 +36,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: email as string
           }
         });
+
+        const userFf = await prisma.freightForwarder.findUnique({
+          where: {
+            email: email as string
+          }
+        })
         
-        if (!user && !userTs) {
+        if (!user && !userTs && !userFf) {
           throw new CredentialsSignin("user is in valid");
+          
         }
 
         if (user) {
@@ -61,6 +68,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid password");
           }
           return { id: userTs.id, name: userTs.name, email: userTs.email };
+
+        }
+         if (userFf) {
+          const isPasswordValid = await bcrypt.compare(
+            password as string,
+            userFf.password
+          );
+            if (!isPasswordValid) {
+          throw new Error("Invalid password");
+          }
+          return { id: userFf.id, name: userFf.name, email: userFf.email };
 
         }
         return null;

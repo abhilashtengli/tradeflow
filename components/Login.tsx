@@ -38,6 +38,8 @@ const Login = () => {
         redirect("/dashboard");
       } else if (userRole === "Transporter") {
         redirect("/tsdashboard");
+      } else if (userRole === "FreightForwarder") {
+        redirect("/ffdashboard");
       }
     }
   };

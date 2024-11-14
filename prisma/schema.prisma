@@ -90,21 +90,22 @@ model FreightForwarder {
 }
 
 model FreightBooking {
-  id                  String              @id @default(uuid())
-  freightForwarder    FreightForwarder    @relation(fields: [freightForwarderId], references: [id])
+  id                  String               @id @default(uuid())
+  freightForwarder    FreightForwarder     @relation(fields: [freightForwarderId], references: [id])
   freightForwarderId  String               @default("not yet accepted ")
-  user                User                @relation(fields: [userId], references: [id])
+  user                User                 @relation(fields: [userId], references: [id])
   userId              String
   containerType       ContainerType   
   noOfContainers      Int      
-  load                Int            //load in tons
+  load                Int                  //load in tons
   origin              String    
   destination         String 
   freightQuote        FreightQuote[]
   departureDate       DateTime
-  price               Float?               
+  price               Float?         
+  dispatched          Boolean                 @default(false)      
   arrivalDate         DateTime?               @default(now())
-  accepted            Boolean                 @default(false)
+  freightIsAccepted   Boolean                 @default(false)
   userConfirm         confirmFreightBooking?            
   createdAt           DateTime                @default(now())
   updatedAt           DateTime                @updatedAt

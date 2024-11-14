@@ -25,7 +25,9 @@ export async function POST(request: NextRequest) {
         category: body.category,
         quantity: body.quantity,
         price: body.price,
+        unit: body.unit,
         country: body.country,
+        productOrigin : body.productOrigin,
         isAvailable: body.isAvailable,
         userId: "81720a24-1739-43e2-89a6-baff01d18cb5"
       }

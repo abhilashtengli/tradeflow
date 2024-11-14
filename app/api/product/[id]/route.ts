@@ -79,7 +79,10 @@ export async function PATCH(
         price: body.price !== undefined ? body.price : undefined,
         country: body.country !== undefined ? body.country : undefined,
         isAvailable:
-          body.isAvailable !== undefined ? body.isAvailable : undefined
+          body.isAvailable !== undefined ? body.isAvailable : undefined,
+        unit: body.unit !== undefined ? body.unit : undefined,
+        productOrigin:
+          body.productOrigin !== undefined ? body.productOrigin : undefined
       }
     });
   } catch (err) {

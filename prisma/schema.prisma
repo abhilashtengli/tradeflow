@@ -8,6 +8,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  Buyer
+  Seller
+}
+
+
+enum ContainerType {
+  Type_20 
+  Type_40
+}
+
+enum confirmFreightBooking { 
+  accepted
+  rejected
+}
+
+enum Unit {
+  pcs
+  box
+  kg 
+  grams
+  tons
+  cm
+  meter
+  inch
+  feet
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  CANCELLED
+}
+
+enum Currency {
+  USD 
+  EURO
+  GBP
+  INR
+  RUB
+  CNY
+}
+
 model User {
 
 id                   String       @id @default(uuid())
@@ -73,14 +117,13 @@ model ProductBooking {
   quantity                  Int
   noOfDaystoDeliver         Int?
   buyerConfirm              Boolean       @default(false)
+  bookingConfirm            Boolean       @default(false)
   isDispatched              Boolean       @default(false)
   isDelivered               Boolean       @default(false)
   totalPrice                Float         @default(0)
   paymentStatus             PaymentStatus @default(PENDING)
-  totalAmount               Float?
   containerTypeBooked       ContainerType?   
   noOfContainersBooked      Int?   
-  isVesselDispatched        Boolean?
   departureDate             DateTime?
   expectedArrivalDate       DateTime?
   createdAt                 DateTime      @default(now())
@@ -167,46 +210,3 @@ model FreightQuote  {
   isAccepted           Boolean?
 }
 
-enum Role {
-  Buyer
-  Seller
-}
-
-
-enum ContainerType {
-  Type_20 
-  Type_40
-}
-
-enum confirmFreightBooking { 
-  accepted
-  rejected
-}
-
-enum Unit {
-  pcs
-  box
-  kg 
-  grams
-  tons
-  cm
-  meter
-  inch
-  feet
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  PARTIALLY_PAID
-  CANCELLED
-}
-
-enum Currency {
-  USD 
-  EURO
-  GBP
-  INR
-  RUB
-  CNY
-}

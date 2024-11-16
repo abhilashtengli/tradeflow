@@ -1,27 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 
-const validateId = z.object({
-  productBookingId: z.string()
-});
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest) {
+//Get by bookingId
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    const body = await request.json();
-    const result = validateId.safeParse(body);
-
-    if (!result.success) {
-      return NextResponse.json({
-        message: "invalid input",
-        error: result.error.errors
-      });
-    }
+    const { id } = await params;
 
     const data = prisma.productBooking.findUnique({
       where: {
-        id: body.productBookingId
+        id: id
       },
       select: {
         buyer: {
@@ -32,7 +24,23 @@ export async function GET(request: NextRequest) {
             country: true
           }
         },
-        product: true
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            country: true
+          }
+        },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            category: true,
+            productOrigin: true
+          }
+        }
       }
     });
     return NextResponse.json({

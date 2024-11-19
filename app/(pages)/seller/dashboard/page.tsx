@@ -1,19 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
-import Link from "next/link";
-import {
-  Bell,
-  Package,
-  FileText,
-  ShoppingCart,
-  Upload,
-  User,
-  Search,
-  MoreVertical
-} from "lucide-react";
-
+import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -21,7 +8,6 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,83 +65,8 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800">TradeFlow</h1>
-        </div>
-        <nav className="mt-6">
-          <Link
-            href="/dashboard"
-            className="block py-2 px-4 text-gray-700 bg-gray-200 hover:bg-gray-300"
-          >
-            <Package className="inline-block mr-2" size={20} />
-            Dashboard
-          </Link>
-          <Link
-            href="/quotations"
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200"
-          >
-            <FileText className="inline-block mr-2" size={20} />
-            Quotations
-          </Link>
-          <Link
-            href="/bookings"
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200"
-          >
-            <ShoppingCart className="inline-block mr-2" size={20} />
-            Product Bookings
-          </Link>
-          <Link
-            href="/upload"
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200"
-          >
-            <Upload className="inline-block mr-2" size={20} />
-            Upload Products
-          </Link>
-          <Link
-            href="/profile"
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200"
-          >
-            <User className="inline-block mr-2" size={20} />
-            Profile
-          </Link>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate">
-              Seller Dashboard
-            </h2>
-            <div className="flex items-center">
-              <div className="relative">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-10 pr-4 py-2 rounded-full"
-                />
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-              </div>
-              <Button variant="ghost" size="icon" className="ml-4">
-                <Bell size={20} />
-              </Button>
-              <Avatar className="ml-4">
-                <AvatarImage src="/placeholder-avatar.jpg" alt="User" />
-                <AvatarFallback>US</AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
+    <div className="">
+      <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Product Listings */}

@@ -28,14 +28,16 @@ const Login = () => {
       email,
       password
     });
-      const { data } = await axios.post("/api/getUserRole", { email });
-      const userRole = data.role;
+    const { data } = await axios.post("/api/getUserRole", { email });
+    const userRole = data.role;
 
     if (res?.error) {
       setError(res.error);
     } else {
-      if (userRole === "Buyer" || userRole === "Seller") {
-        redirect("/dashboard");
+      if (userRole === "Buyer") {
+        redirect("/buyer/dashboard");
+      } else if (userRole === "Seller") {
+        redirect("/seller/dashboard");
       } else if (userRole === "Transporter") {
         redirect("/tsdashboard");
       } else if (userRole === "FreightForwarder") {

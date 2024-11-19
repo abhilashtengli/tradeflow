@@ -100,6 +100,7 @@ model Product{
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   productBooking ProductBooking[]
+  productQuote ProductQuote[]
 }
 
 model ProductBooking {
@@ -132,17 +133,18 @@ model ProductBooking {
 
 model ProductQuote {
   id                        String          @id @default(uuid())
+  product                   Product         @relation( fields: [productId], references: [id]) 
   productId                 String
   paymentTerms              String?
   Buyer                     User            @relation("ProductQuoteBuyer", fields: [buyerId], references: [id]) 
   buyerId                   String
   Seller                    User            @relation("ProductQuoteSeller", fields: [sellerId], references: [id]) // Relation to User (Seller)
-  sellerId                  String           //userId whose role is Seller 
+  sellerId                  String           
   currency                  Currency?
   portOfOrigin              String?
   price                     Float?
   noOfDaystoDeliver         Int?
-
+  pendingQuotes             Boolean   @default(true)
 }
 
 model Transportation {

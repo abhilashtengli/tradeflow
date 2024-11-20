@@ -3,16 +3,18 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 //get the sent quotes
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
-    const sellerId = (await request.headers.get("x-user-id")) as string;
+    // const sellerId = (await request.headers.get("x-user-id")) as string;
+    console.log("reached be");
 
     const QuoteData = await prisma.productQuote.findMany({
       where: {
-        sellerId: sellerId,
+        sellerId: "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a",
         pendingQuotes: false
       },
-      select: { Buyer: true, product: true }
+      include: { Buyer: true, product: true }
     });
     return NextResponse.json({
       data: QuoteData

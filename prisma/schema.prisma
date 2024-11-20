@@ -144,7 +144,9 @@ model ProductQuote {
   portOfOrigin              String?
   price                     Float?
   noOfDaystoDeliver         Int?
-  pendingQuotes             Boolean   @default(true)
+  pendingQuotes             Boolean       @default(true)
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt @default(now())
 }
 
 model Transportation {

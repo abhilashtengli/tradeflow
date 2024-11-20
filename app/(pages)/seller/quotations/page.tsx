@@ -69,7 +69,7 @@ type Product = {
 type Quote = {
   id: string;
   name: string;
-  Buyer?: { name: string } | undefined;
+  Buyer?: { name: string; country: string } | undefined;
   buyerId: string;
   productId: string;
   pendingQuotes: boolean;
@@ -80,6 +80,7 @@ type Quote = {
   noOfDaystoDeliver: number | null;
   paymentTerms: string | null;
   portOfOrigin: string | null;
+  createdAt: string;
 };
 
 export default function QuotationSection() {
@@ -94,6 +95,7 @@ export default function QuotationSection() {
     productQuoteId: ""
   });
   const [requestedQuotes, setRequestedQuotes] = useState<Quote[]>([]);
+  const [sentQuotes, setSentQuotes] = useState<Quote[]>([]);
 
   useEffect(() => {
     const fetchRequestedQuotes = async () => {
@@ -101,15 +103,27 @@ export default function QuotationSection() {
         const response = await axios.get<{ data: Quote[] }>(
           `${baseUrl}/product/productQuote/sellerQuote`
         );
-        console.log(response.data.data);
+        // console.log(response.data.data);
 
         setRequestedQuotes(response.data.data || []);
       } catch (error) {
         console.log("Error fetching requested quotes:", error);
       }
     };
+    const fetchSentquotes = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/product/productQuote/sellerQuote/getSentQuotes`
+        );
+        console.log(response.data.data);
 
+        setSentQuotes(response.data.data || []);
+      } catch (error) {
+        console.log("Error fetching requested quotes:", error);
+      }
+    };
     fetchRequestedQuotes();
+    fetchSentquotes();
   }, []);
 
   const handleSendQuote = (quote: Quote) => {
@@ -169,14 +183,23 @@ export default function QuotationSection() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {requestedQuotes.map((quote) => (
               <Card key={quote.product?.id}>
-                <CardHeader>
+                <CardHeader className="grid grid-cols-2">
+                  <div>
                   <CardTitle>{quote.product?.name}</CardTitle>{" "}
                   {/* Accessing the product name */}
                   <CardDescription>
                     Requested by{" "}
                     {quote.Buyer?.name?.toUpperCase() || "Unknown Buyer"}
                   </CardDescription>{" "}
-                  {/* Using buyerId or default */}
+                    {/* Using buyerId or default */}
+                  </div>
+                  <div className="text-[12px]  text-end">
+                    {new Intl.DateTimeFormat("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric"
+                    }).format(new Date(quote.createdAt))}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {/* Ensure valid fields */}
@@ -201,16 +224,32 @@ export default function QuotationSection() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {sentQuotes.map((quote) => (
               <Card key={quote.id}>
-                <CardHeader>
-                  <CardTitle>{quote.product}</CardTitle>
-                  <CardDescription>Sent to {quote.customer}</CardDescription>
+                <CardHeader className="grid grid-cols-2 ">
+                  <div>
+                    <CardTitle>{quote.product?.name}</CardTitle>
+                    <CardDescription>
+                      Sent to {quote.Buyer?.name}
+                    </CardDescription>
+                  </div>
+                  <div className="text-[12px]  text-end">
+                    {new Intl.DateTimeFormat("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric"
+                    }).format(new Date(quote.createdAt))}
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <p>Quantity: {quote.quantity}</p>
-                  <p>
-                    Price: {quote.price} {quote.currencyType}
-                  </p>
-                  <p>Port of Origin: {quote.portOfOrigin}</p>
+                <CardContent className="text-zinc-800">
+                  <p>Price quotated : {quote.price} {quote.currency }</p>
+                  <p>Category : {quote.product?.category }</p>
+                  {quote.portOfOrigin && (
+                    <p>Port of Origin : {quote.portOfOrigin}</p>
+                  )}
+                  {quote.noOfDaystoDeliver && (
+                    <p>No of Days to deliver : {quote.noOfDaystoDeliver} </p>
+                  )}
+                  <p>Country : {quote.Buyer?.country}</p>
+                  <p>Payment Terms : {quote.paymentTerms}</p>
                 </CardContent>
               </Card>
             ))}
@@ -332,6 +371,9 @@ export default function QuotationSection() {
                     <SelectItem value="USD">USD</SelectItem>
                     <SelectItem value="EUR">EUR</SelectItem>
                     <SelectItem value="GBP">GBP</SelectItem>
+                    <SelectItem value="GBP">INR</SelectItem>
+                    <SelectItem value="GBP">RUB</SelectItem>
+                    <SelectItem value="GBP">CNY</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

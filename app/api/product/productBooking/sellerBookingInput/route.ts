@@ -2,17 +2,18 @@ import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 const validateUpdateInput = z.object({
-  noOfDaystoDeliver: z.number().min(1),
-  totalPrice: z.number(),
-  paymentStatus: z.number(),
   isDispatched: z.boolean(),
   isDelivered: z.boolean(),
   containerTypeBooked: z.enum(["Type_20", "Type_40"]),
   noOfContainersBooked: z.number().min(1),
-  departureDate: z.date().refine(date => date > new Date()),
-  expectedArrivalDate: z.date().refine(date => date > new Date()),
-  productBookingId: z.string(),
-  bookingConfirmed: z.boolean()
+  departureDate: z
+    .string()
+    .refine(date => !isNaN(Date.parse(date)), "Invalid date format"),
+  expectedArrivalDate: z
+    .string()
+    .refine(date => !isNaN(Date.parse(date)), "Invalid date format"),
+
+  productBookingId: z.string()
 });
 
 const prisma = new PrismaClient();
@@ -20,6 +21,7 @@ const prisma = new PrismaClient();
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log(body);
 
     const result = validateUpdateInput.safeParse(body);
 
@@ -29,36 +31,27 @@ export async function PATCH(request: NextRequest) {
         error: result.error.errors
       });
     }
+    const parsedBody = {
+      ...body,
+      departureDate: body.departureDate
+        ? new Date(body.departureDate)
+        : undefined,
+      expectedArrivalDate: body.expectedArrivalDate
+        ? new Date(body.expectedArrivalDate)
+        : undefined
+    };
+
     const data = await prisma.productBooking.update({
       where: {
-        id: body.productBookingId
+        id: parsedBody.productBookingId
       },
       data: {
-        noOfDaystoDeliver:
-          body.noOfDaystoDeliver !== undefined
-            ? body.noOfDaystoDeliver
-            : undefined,
-        totalPrice: body.totalPrice,
-        paymentStatus: body.paymentStatus,
-        isDispatched:
-          body.isDispatched !== undefined ? body.isDispatched : undefined,
-        isDelivered:
-          body.isDelivered !== undefined ? body.isDelivered : undefined,
-        containerTypeBooked:
-          body.containerTypeBooked !== undefined
-            ? body.containerType
-            : undefined,
-        noOfContainersBooked:
-          body.noOfContainersBooked !== undefined
-            ? body.noOfContainersBooked
-            : undefined,
-        departureDate:
-          body.departureDate !== undefined ? body.departureDate : undefined,
-        expectedArrivalDate:
-          body.expectedArrivalDate !== undefined
-            ? body.expectedArrival
-            : undefined,
-        bookingConfirm: body.bookingConfirm
+        isDispatched: parsedBody.isDispatched,
+        isDelivered: parsedBody.isDelivered,
+        containerTypeBooked: parsedBody.containerTypeBooked,
+        noOfContainersBooked: parsedBody.noOfContainersBooked,
+        departureDate: parsedBody.departureDate,
+        expectedArrivalDate: parsedBody.expectedArrivalDate
       }
     });
     return NextResponse.json({
@@ -73,13 +66,15 @@ export async function PATCH(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id") as string;
+    // const userId = request.headers.get("x-user-id") as string;
 
-    const data = prisma.productBooking.findMany({
+    console.log("reached db");
+
+    const data = await prisma.productBooking.findMany({
       where: {
-        sellerId: userId
+        sellerId: "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"
       },
-      select: {
+      include: {
         buyer: {
           select: {
             id: true,
@@ -99,6 +94,8 @@ export async function GET(request: NextRequest) {
         }
       }
     });
+    console.log(data);
+
     return NextResponse.json({
       data: data
     });
@@ -108,4 +105,3 @@ export async function GET(request: NextRequest) {
     });
   }
 }
-

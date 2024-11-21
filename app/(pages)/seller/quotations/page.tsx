@@ -371,9 +371,9 @@ export default function QuotationSection() {
                     <SelectItem value="USD">USD</SelectItem>
                     <SelectItem value="EUR">EUR</SelectItem>
                     <SelectItem value="GBP">GBP</SelectItem>
-                    <SelectItem value="GBP">INR</SelectItem>
-                    <SelectItem value="GBP">RUB</SelectItem>
-                    <SelectItem value="GBP">CNY</SelectItem>
+                    <SelectItem value="INR">INR</SelectItem>
+                    <SelectItem value="RUB">RUB</SelectItem>
+                    <SelectItem value="CNY">CNY</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

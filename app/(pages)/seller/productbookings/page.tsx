@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
 import * as React from "react";
@@ -67,29 +68,30 @@ interface BookingConfirmData {
   paymentStatus: string;
   productBookingId: string;
   bookingConfirm: boolean;
+  currency: string;
+  billingAddress : string;
 }
-
-const deliveredProducts = [
-  {
-    id: 3,
-    productId: "P003",
-    buyerId: "B003",
-    quantity: 150,
-    deliveryDate: new Date(2023, 4, 1)
-  },
-  {
-    id: 4,
-    productId: "P004",
-    buyerId: "B004",
-    quantity: 300,
-    deliveryDate: new Date(2023, 4, 15)
-  }
-];
+interface DeliveredProduct {
+  id: string;
+  buyer?: {
+    id: string;
+    country: string;
+  };
+  product?: {
+    id: string;
+    name: string;
+  };
+  quantity: number;
+  paymentStatus: string;
+  totalPrice: number;
+  deliveredDate: Date | null;
+  currency: string;
+}
 
 export default function ProductBookingDashboard() {
   const [loading, setLoading] = React.useState(true);
   const [bookings, setBookings] = React.useState<Booking[]>([]);
-  const [delivered, setDelivered] = React.useState(deliveredProducts);
+  const [delivered, setDelivered] = React.useState<DeliveredProduct[]>([]);
 
   React.useEffect(() => {
     const fetchProductBookings = async () => {
@@ -104,7 +106,20 @@ export default function ProductBookingDashboard() {
         setLoading(false);
       }
     };
+
+    const fetchDeliveredProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/product/productBooking/sellerBookingInput/deliveredProduct`
+        );
+        // console.log(response.data.data);
+        setDelivered(response.data.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
     fetchProductBookings();
+    fetchDeliveredProducts();
   }, []);
 
   const handleConfirmBooking = (id: string, data: BookingConfirmData) => {
@@ -186,14 +201,27 @@ export default function ProductBookingDashboard() {
                 <div key={product.id} className="mb-4 p-4 border rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-semibold">
-                      Product ID: {product.productId}
+                      Product Name: {product.product?.name}
                     </span>
                     <span className="text-sm text-gray-500">
-                      {format(product.deliveryDate, "MMM d, yyyy")}
+                      {/* {format(product.deliveredDate, "MMM d, yyyy")} */}
                     </span>
                   </div>
-                  <div>Buyer ID: {product.buyerId}</div>
+                  <div>Buyer ID : {product.buyer?.id}</div>
+                  <div>Product ID : {product.product?.id}</div>
+                  <div>
+                    Country : {product.buyer?.country || "Not mentioned"}{" "}
+                  </div>
                   <div>Quantity: {product.quantity}</div>
+                  <div>Payment status: {product.paymentStatus}</div>
+                  <div>Total Price : {product.currency} {product.totalPrice} /-</div>
+                  <div>
+                    Delivered on :
+                    {product.deliveredDate
+                      ? new Date(product.deliveredDate).toLocaleDateString()
+                      : " No date set"}
+                  </div>
+                  <div></div>
                 </div>
               ))}
             </CardContent>
@@ -204,17 +232,12 @@ export default function ProductBookingDashboard() {
   );
 }
 
-function BookingCard({
-  booking,
-  onConfirm,
-  onUpdateDispatch
-}: BookingCardProps) {
-  const [departureDate, setDepartureDate] = React.useState<Date | null>(
-    booking.departureDate
-  );
+function BookingCard({ booking }: BookingCardProps) {
+  const [departureDate, setDepartureDate] = React.useState<Date | null>(null);
+  const [deliveredDate, setDeliveredDate] = React.useState<Date | null>();
   const [expectedArrivalDate, setExpectedArrivalDate] =
-    React.useState<Date | null>(booking.expectedArrivalDate);
-
+    React.useState<Date | null>(null);
+  
   const handleConfirm = async (
     e: React.FormEvent<HTMLFormElement>,
     { id }: { id: string }
@@ -225,10 +248,11 @@ function BookingCard({
       noOfDaystoDeliver: Number(formData.get("noOfDaystoDeliver")),
       totalPrice: Number(formData.get("totalPrice")),
       paymentStatus: formData.get("paymentStatus") as string,
+      billingAddress: formData.get("billingAddress") as string,
       productBookingId: id,
-      bookingConfirm: true
+      bookingConfirm: true,
+      currency: formData.get("currency") as string
     };
-    console.log(data);
 
     //send data to backend
     try {
@@ -240,7 +264,7 @@ function BookingCard({
     } catch (err) {
       console.log(err);
     }
-    onConfirm?.(booking.id, data);
+    // onConfirm?.(booking.id, data);
   };
 
   const handleUpdateDispatch = async (
@@ -255,15 +279,17 @@ function BookingCard({
       containerTypeBooked: formData.get("containerTypeBooked") as string,
       noOfContainersBooked: Number(formData.get("noOfContainersBooked")),
       productBookingId: id,
-       departureDate: departureDate ? departureDate.toISOString() : null, // ISO format
-       expectedArrivalDate: expectedArrivalDate ? expectedArrivalDate.toISOString() : null, // ISO format
+      departureDate: departureDate ? departureDate.toISOString() : null, // ISO format
+      expectedArrivalDate: expectedArrivalDate
+        ? expectedArrivalDate.toISOString()
+        : null // ISO format
     };
     console.log(data);
 
     //send data to backend
     try {
       const response = await axios.patch(
-        `${baseUrl}/product/productBooking/sellerBookingInput/`,
+        `${baseUrl}/product/productBooking/sellerBookingInput`,
         data
       );
       console.log(response.data);
@@ -271,6 +297,31 @@ function BookingCard({
       console.log(err);
     }
     // onUpdateDispatch?.(booking.id, data );
+  };
+
+  const handleUpdateDelivery = async (
+    e: React.FormEvent<HTMLFormElement>,
+    { id }: { id: string }
+  ) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      isDelivered: formData.get("isDelivered") === "on",
+      productBookingId: id,
+      paymentStatus: formData.get("paymentStatus") as string,
+      deliveredDate: deliveredDate ? deliveredDate.toISOString() : null
+    };
+    console.log(data);
+
+    try {
+      const response = await axios.patch(
+        `${baseUrl}/product/productBooking/sellerBookingInput/deliveryBookingInput`,
+        data
+      );
+      console.log(response.data.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -329,21 +380,52 @@ function BookingCard({
                   required
                 />
               </div>
+              <div className="">
+                <Label htmlFor="currency" className="">
+                  Currency
+                </Label>
+                <Select name="currency" defaultValue="USD" required>
+                  <SelectTrigger className="">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EURO">EUR</SelectItem>
+                    <SelectItem value="GBP">GBP</SelectItem>
+                    <SelectItem value="INR">INR</SelectItem>
+                    <SelectItem value="RUB">RUB</SelectItem>
+                    <SelectItem value="CNY">CNY</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="paymentStatus">Payment Status</Label>
+                <Select name="paymentStatus" defaultValue="PENDING">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select payment status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                    <SelectItem value="PAID">Paid</SelectItem>
+                    <SelectItem value="PARTIALLY_PAID">
+                      Partially Paid
+                    </SelectItem>
+                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="billingAddress">Billing Address </Label>
+                <Input
+                  id="billingAddress"
+                  name="billingAddress"
+                  type="text"
+                  placeholder="ex : port land, India"
+                  required
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="paymentStatus">Payment Status</Label>
-              <Select name="paymentStatus" defaultValue="PENDING">
-                <SelectTrigger>
-                  <SelectValue placeholder="Select payment status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="PAID">Paid</SelectItem>
-                  <SelectItem value="PARTIALLY_PAID">Partially Paid</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
             <Button type="submit">Confirm Booking</Button>
           </form>
         )}
@@ -426,7 +508,11 @@ function BookingCard({
                       //@ts-ignore
                       selected={departureDate}
                       //@ts-ignore
-                      onSelect={setDepartureDate}
+                      onSelect={(date) => {
+                        console.log("Selected Departure Date:", date);
+
+                        setDepartureDate(date || null);
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -457,7 +543,11 @@ function BookingCard({
                       //@ts-ignore
                       selected={expectedArrivalDate}
                       //@ts-ignore
-                      onSelect={setExpectedArrivalDate}
+                      onSelect={(date) => {
+                        console.log("Selected arrival Date:", date);
+
+                        setExpectedArrivalDate(date || null);
+                      }}
                       initialFocus
                     />
                   </PopoverContent>
@@ -467,126 +557,85 @@ function BookingCard({
             <Button type="submit">Update Dispatch Details</Button>
           </form>
         )}
-          {booking.bookingConfirm && booking.isDispatched && !booking.isDelivered && (
-          <form
-            onSubmit={(e) => {
-              handleUpdateDispatch(e, { id: booking.id });
-            }}
-            className="mt-4 space-y-4"
-          >
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isDispatched"
-                  name="isDispatched"
-                  // checked={booking.isDispatched}
-                />
-                <Label htmlFor="isDispatched">Dispatched</Label>
+        {booking.bookingConfirm &&
+          booking.isDispatched &&
+          !booking.isDelivered && (
+            <form
+              onSubmit={(e) => {
+                handleUpdateDelivery(e, { id: booking.id });
+              }}
+              className="mt-4 space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isDispatched"
+                    name="isDispatched"
+                    checked={booking.isDispatched}
+                  />
+                  <Label htmlFor="isDispatched">Dispatched</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="isDelivered"
+                    name="isDelivered"
+                    defaultChecked={booking.isDelivered}
+                  />
+                  <Label htmlFor="isDelivered">Delivered</Label>
+                </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isDelivered"
-                  name="isDelivered"
-                  // checked={booking.isDelivered}
-                />
-                <Label htmlFor="isDelivered">Delivered</Label>
+              <div className="grid grid-cols-2 gap-x-4">
+                <div>
+                  <Label htmlFor="paymentStatus">Payment Status</Label>
+                  <Select name="paymentStatus" defaultValue={booking.paymentStatus}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select payment status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PENDING">Pending</SelectItem>
+                      <SelectItem value="PAID">Paid</SelectItem>
+                      <SelectItem value="PARTIALLY_PAID">
+                        Partially Paid
+                      </SelectItem>
+                      <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Delivered Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !deliveredDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {deliveredDate ? (
+                          format(deliveredDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        //@ts-ignore
+                        selected={deliveredDate}
+                        //@ts-ignore
+                        onSelect={setDeliveredDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="containerTypeBooked">Container Type</Label>
-                <Select
-                  name="containerTypeBooked"
-                  defaultValue={booking.containerTypeBooked || ""}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select container type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Type_20">20ft</SelectItem>
-                    <SelectItem value="Type_40">40ft</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="noOfContainersBooked">
-                  Number of Containers
-                </Label>
-                <Input
-                  id="noOfContainersBooked"
-                  name="noOfContainersBooked"
-                  type="number"
-                  defaultValue={booking.noOfContainersBooked?.toString() || ""}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Departure Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !departureDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {departureDate ? (
-                        format(departureDate, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      //@ts-ignore
-                      selected={departureDate}
-                      //@ts-ignore
-                      onSelect={setDepartureDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div>
-                <Label>Expected Arrival Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !expectedArrivalDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {expectedArrivalDate ? (
-                        format(expectedArrivalDate, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      //@ts-ignore
-                      selected={expectedArrivalDate}
-                      //@ts-ignore
-                      onSelect={setExpectedArrivalDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            <Button type="submit">Update Dispatch Details</Button>
-          </form>
-        )}
+              <Button type="submit">Update Delivery Details</Button>
+            </form>
+          )}
       </CardContent>
       <CardFooter>
         <div className="flex justify-between items-center w-full">
@@ -611,3 +660,4 @@ function BookingCard({
     </Card>
   );
 }
+

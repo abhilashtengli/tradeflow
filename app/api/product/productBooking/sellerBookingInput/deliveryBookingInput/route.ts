@@ -3,24 +3,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const validateUpdateInput = z.object({
-  noOfDaystoDeliver: z.number().min(1),
-  totalPrice: z.number(),
-  currency: z.enum(["USD", "EURO", "GBP", "INR", "RUB", "CNY"]),
-  paymentStatus: z.enum(["PENDING", "PAID", "PARTIALLY_PAID", "CANCELLED"]),
+  isDelivered: z.boolean(),
   productBookingId: z.string(),
-  bookingConfirm: z.boolean(),
-  billingAddress: z.string()
+  paymentStatus: z.enum(["PENDING", "PAID", "PARTIALLY_PAID", "CANCELLED"]),
+  deliveredDate: z
+    .string()
+    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
 });
 const prisma = new PrismaClient();
 
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    // console.log(body);
+    console.log(body);
 
     const result = validateUpdateInput.safeParse(body);
 
     if (!result.success) {
+      console.log(result.error.errors);
+
       return NextResponse.json({
         message: "invalid input",
         error: result.error.errors
@@ -31,15 +32,11 @@ export async function PATCH(request: NextRequest) {
         id: body.productBookingId
       },
       data: {
-        noOfDaystoDeliver:
-          body.noOfDaystoDeliver !== undefined
-            ? body.noOfDaystoDeliver
-            : undefined,
-        totalPrice: body.totalPrice,
+        isDelivered: body.isDelivered,
         paymentStatus: body.paymentStatus,
-        bookingConfirm: body.bookingConfirm,
-        currency: body.currency,
-        billingAddress: body.billingAddress
+        deliveredDate: body.deliveredDate
+          ? new Date(body.deliveredDate)
+          : undefined
       }
     });
     return NextResponse.json({

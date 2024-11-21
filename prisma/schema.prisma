@@ -125,8 +125,10 @@ model ProductBooking {
   paymentStatus             PaymentStatus @default(PENDING)
   containerTypeBooked       ContainerType?   
   noOfContainersBooked      Int?   
+  currency                  Currency?
   departureDate             DateTime?
   expectedArrivalDate       DateTime?
+  deliveredDate             DateTime?
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
 }

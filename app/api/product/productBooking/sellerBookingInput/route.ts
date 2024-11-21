@@ -8,12 +8,18 @@ const validateUpdateInput = z.object({
   noOfContainersBooked: z.number().min(1),
   departureDate: z
     .string()
-    .refine(date => !isNaN(Date.parse(date)), "Invalid date format"),
+    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
+    .refine(
+      date => new Date(date) >= new Date(),
+      "Departure date cannot be in the past"
+    ),
   expectedArrivalDate: z
     .string()
-    .refine(date => !isNaN(Date.parse(date)), "Invalid date format"),
-
-  productBookingId: z.string()
+    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
+    .refine(
+      date => new Date(date) >= new Date(),
+      "Expected arrival date cannot be in the past"
+    )
 });
 
 const prisma = new PrismaClient();
@@ -21,7 +27,6 @@ const prisma = new PrismaClient();
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    console.log(body);
 
     const result = validateUpdateInput.safeParse(body);
 
@@ -64,11 +69,11 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     // const userId = request.headers.get("x-user-id") as string;
 
-    console.log("reached db");
 
     const data = await prisma.productBooking.findMany({
       where: {
@@ -94,7 +99,6 @@ export async function GET(request: NextRequest) {
         }
       }
     });
-    console.log(data);
 
     return NextResponse.json({
       data: data

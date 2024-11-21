@@ -8,14 +8,26 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
     const body = await request.json();
 
-    const { success } = CreateProduct.safeParse(body);
+    const result = CreateProduct.safeParse(body);
 
-    if (!success) {
+    if (!result.success) {
       return NextResponse.json({
-        message: "Invalid parameters given"
+        message: "Invalid parameters given",
+        errors: result.error.errors
       });
+    }
+
+    const isPresent = await prisma.product.findMany({
+      where: {
+        name: body.name,
+        userId: userId
+      }
+    });
+    if (isPresent) {
+      return NextResponse.json({ message: "Product already exists" });
     }
 
     const newProduct = await prisma.product.create({
@@ -27,9 +39,9 @@ export async function POST(request: NextRequest) {
         price: body.price,
         unit: body.unit,
         country: body.country,
-        productOrigin : body.productOrigin,
+        productOrigin: body.productOrigin,
         isAvailable: body.isAvailable,
-        userId: "81720a24-1739-43e2-89a6-baff01d18cb5"
+        userId: "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"
       }
     });
 

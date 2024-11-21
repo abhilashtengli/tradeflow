@@ -86,7 +86,7 @@ model UserTransporter {
 model Product{
 
   id            String    @id @default(uuid())
-  name          String
+  name          String    @unique
   description   String
   category      String
   unit          Unit

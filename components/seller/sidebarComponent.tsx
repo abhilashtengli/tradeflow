@@ -17,7 +17,7 @@ const Sidebar = () => {
 
   return (
     <div>
-      <aside className="w-64 bg-white shadow-md h-screen">
+      <aside className="w-64 bg-white shadow-md h-full">
         <div className="p-4">
           <h1 className="text-2xl font-bold text-gray-800">TradeFlow</h1>
         </div>

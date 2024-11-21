@@ -3,11 +3,16 @@ import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
-const userUpdate = z.object({
-  name: z.string().min(2).max(50),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["Buyer", "Seller"])
-});
+const userUpdate = z
+  .object({
+    name: z.string().min(2).max(50).optional(),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .optional(),
+    email: z.string().optional(),
+    country: z.string().optional()
+  })
 const prisma = new PrismaClient();
 
 //GetAll Users
@@ -29,8 +34,11 @@ export async function GET(request: NextRequest) {
 
 //Update Users
 export async function PATCH(request: NextRequest) {
+  console.log("reached be");
+
   try {
-    const userId = request.headers.get("x-user-id") as string;
+    // const userId = request.headers.get("x-user-id") as string;
+    const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
 
     const user = await prisma.user.findUnique({
       where: {
@@ -49,10 +57,13 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json();
 
-    const { success } = userUpdate.safeParse(body);
+    const result = userUpdate.safeParse(body);
 
-    if (!success) {
-      return NextResponse.json({ message: "Invalid inputs" }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json({
+        message: "Invalid inputs",
+        errors: result.error.errors
+      });
     }
     const hashedPassword = body.password
       ? await bcrypt.hash(body.password, 10)
@@ -63,9 +74,10 @@ export async function PATCH(request: NextRequest) {
         id: userId
       },
       data: {
-        name: body.name,
-        password: hashedPassword || user.password,
-        role: body.role
+        name: body.name !== undefined ? body.name : undefined,
+        password: body.password !== undefined ? hashedPassword : undefined,
+        email: body.email !== undefined ? body.email : undefined,
+        country: body.country !== undefined ? body.country : undefined
       }
     });
 

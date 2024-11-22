@@ -7,28 +7,37 @@ import { CreateProduct } from "./productValidation/route";
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
+  console.log("reached be");
+
   try {
     const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
     const body = await request.json();
+    console.log(body);
 
     const result = CreateProduct.safeParse(body);
 
     if (!result.success) {
+      console.log(result.error.errors);
+
       return NextResponse.json({
         message: "Invalid parameters given",
         errors: result.error.errors
       });
     }
+    console.log("reached present");
 
-    const isPresent = await prisma.product.findMany({
+    const isPresent = await prisma.product.findFirst({
       where: {
         name: body.name,
         userId: userId
       }
     });
+    console.log(isPresent);
+
     if (isPresent) {
       return NextResponse.json({ message: "Product already exists" });
     }
+    console.log("reached add be");
 
     const newProduct = await prisma.product.create({
       data: {
@@ -41,7 +50,8 @@ export async function POST(request: NextRequest) {
         country: body.country,
         productOrigin: body.productOrigin,
         isAvailable: body.isAvailable,
-        userId: "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"
+        currency: body.currency,
+        userId: userId
       }
     });
 

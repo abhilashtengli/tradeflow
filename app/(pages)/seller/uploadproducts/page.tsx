@@ -22,9 +22,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import axios from "axios";
+import { baseUrl } from "@/app/config";
 
 export default function ProductForm() {
-  const [product, setProduct] = React.useState({
+  const [loading, setLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState<string[]>([]);
+
+  const initialProductState = {
     name: "",
     description: "",
     category: "",
@@ -33,8 +38,13 @@ export default function ProductForm() {
     unit: "",
     country: "",
     productOrigin: "",
-    isAvailable: false
-  });
+    isAvailable: false,
+    currency: ""
+  };
+
+  // Set initial product state
+  const [product, setProduct] = React.useState(initialProductState);
+  const [productAdded, setProductAdded] = React.useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -47,10 +57,51 @@ export default function ProductForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
-    console.log("Submitted product:", product);
-    // Handle form submission logic here
+
+    // Check for missing fields
+    const requiredFields: (keyof typeof product)[] = [
+      "name",
+      "description",
+      "category",
+      "quantity",
+      "price",
+      "unit",
+      "country",
+      "productOrigin"
+    ];
+
+    const missingFields = requiredFields.filter(field => !product[field]);
+
+    if (missingFields.length > 0) {
+      setErrors(missingFields); // Store errors in state
+      setLoading(false);
+      return;
+    }
+
+    setErrors([]);
+    console.log(product);
+
+    const productData = {
+      ...product, // Convert quantity and price to numbers
+      quantity: Number(product.quantity) || 0,
+      price: Number(product.price) || 0
+    }; // Fallback to 0 if invalid input // Fallback to 0 if invalid input
+
+    try {
+      const response = await axios.post(`${baseUrl}/product`, productData);
+      console.log(response);
+    } catch (err) {
+      console.log("could not send data ", { error: err });
+    }
+    setProductAdded(true);
+    setTimeout(() => {
+      setProductAdded(false);
+      setProduct(initialProductState);
+    }, 4000);
+    setLoading(false);
   };
 
   return (
@@ -152,6 +203,31 @@ export default function ProductForm() {
                 </div>
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="currency" className="">
+                  Currency
+                </Label>
+                <Select // defaultValue="USD"
+                  required
+                  onValueChange={value =>
+                    setProduct(prev => ({
+                      ...prev,
+                      currency: value
+                    }))}
+                >
+                  <SelectTrigger className="">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EURO">EUR</SelectItem>
+                    <SelectItem value="GBP">GBP</SelectItem>
+                    <SelectItem value="INR">INR</SelectItem>
+                    <SelectItem value="RUB">RUB</SelectItem>
+                    <SelectItem value="CNY">CNY</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="unit">Unit</Label>
                 <Select
                   onValueChange={value =>
@@ -221,7 +297,7 @@ export default function ProductForm() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 ">
               <Switch
                 id="isAvailable"
                 name="isAvailable"
@@ -230,13 +306,26 @@ export default function ProductForm() {
                   setProduct(prev => ({ ...prev, isAvailable: checked }))}
               />
               <Label htmlFor="isAvailable">Available</Label>
+              {errors.length > 0 &&
+                <div className="text-red-500">
+                  Please fill in the Missing fields
+                </div>}
+
+              {productAdded &&
+                <div className="text-green-500 font-semibold">
+                  {product.name} added successfully!
+                </div>}
             </div>
           </div>
         </form>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button type="submit" onClick={handleSubmit}>
-          Add Product
+        <Button
+          type="submit"
+          onClick={handleSubmit}
+          className={`${loading ? "bg-gray-600" : ""}`}
+        >
+          {loading ? "adding product..." : "Add product"}
         </Button>
       </CardFooter>
     </Card>

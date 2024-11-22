@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const validateInput = z.object({
-  producId: z.string()
+  productId: z.string()
 });
 
 const prisma = new PrismaClient();
@@ -11,13 +11,19 @@ const prisma = new PrismaClient();
 // request quote (create quote by first giving about buyer info)
 export async function POST(request: NextRequest) {
   try {
-    const buyerId = (await request.headers.get("x-user-id")) as string;
+    // const buyerId = (await request.headers.get("x-user-id")) as string;
+    const buyerId = "5abd8eff-fb43-47d9-9a61-69291f3e5b42";
 
     const body = await request.json();
-    const { success } = validateInput.safeParse(body);
+    console.log(body);
 
-    if (!success) {
-      return NextResponse.json({ message: " Invalid input" });
+    const result = validateInput.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json({
+        message: " Invalid input",
+        error: result.error.errors
+      });
     }
     const product = await prisma.product.findUnique({
       where: { id: body.productId },
@@ -56,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     const QuoteData = await prisma.productQuote.findMany({
       where: {
-        sellerId: buyerId
+        buyerId: buyerId
       }
     });
     return NextResponse.json({

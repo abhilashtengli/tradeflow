@@ -1,5 +1,4 @@
 // Create product , get All product , Update Product , delete Product
-
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { CreateProduct } from "./productValidation/route";
@@ -102,12 +101,16 @@ export async function DELETE(request: NextRequest) {
 //Get all products
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
+  console.log("reached");
+
   try {
     const products = await prisma.product.findMany();
 
+    console.log(products);
     return NextResponse.json({
-      products: products
+      data: products
     });
+    
   } catch (err) {
     return NextResponse.json({
       error: err

@@ -2,11 +2,11 @@ import Sidebar from "@/components/buyer/sidebarComponent";
 import SearchBar from "@/components/Searchbar/searchbar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 import { Bell, } from "lucide-react";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="flex h-screen bg-gray-100">
+  return <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <header className="bg-white shadow-sm">
@@ -27,9 +27,9 @@ const layout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </header>
         {children}
+        <Toaster />
       </main>
-    </div>
-  );
+    </div>;
 };
 
 export default layout;

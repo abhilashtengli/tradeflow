@@ -33,26 +33,7 @@ import {
 import axios from "axios";
 import { baseUrl } from "@/app/config";
 
-const sentQuotes = [
-  {
-    id: 1,
-    product: "Desktop",
-    quantity: 50,
-    customer: "OfficeSolutions",
-    price: 500,
-    portOfOrigin: "Shanghai",
-    currencyType: "USD"
-  },
-  {
-    id: 2,
-    product: "Printer",
-    quantity: 30,
-    customer: "PrintPro",
-    price: 200,
-    portOfOrigin: "Hong Kong",
-    currencyType: "EUR"
-  }
-];
+
 type Product = {
   id: string;
   name: string;
@@ -64,6 +45,7 @@ type Product = {
   unit: string;
   productOrigin: string;
   isAvailable: boolean;
+  currency : string
 };
 
 type Quote = {
@@ -207,7 +189,7 @@ export default function QuotationSection() {
                   <p>
                     Price:{" "}
                     {quote.product?.price
-                      ? `${quote.product.price} INR`
+                      ? `${quote.product.price} ${quote.product.currency}`
                       : "N/A"}
                   </p>
                 </CardContent>

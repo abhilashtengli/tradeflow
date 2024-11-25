@@ -16,6 +16,9 @@ export async function GET() {
         bookingConfirm: true,
         isDelivered: false,
         isDispatched: false //
+      },
+      include: {
+        product: true
       }
     });
 

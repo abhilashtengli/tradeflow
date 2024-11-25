@@ -189,6 +189,7 @@ export default function QuotationSection({ sent, received }: QuoteProps) {
                     </CardDescription>{" "}
                     {/* Using buyerId or default */}
                   </div>
+                  
                 </CardHeader>
                 <CardContent>
                   {/* Ensure valid fields */}
@@ -197,7 +198,7 @@ export default function QuotationSection({ sent, received }: QuoteProps) {
                   <p>
                     Status:{" "}
                     {quote.pendingQuotes === true ? (
-                      <span className="text-green-500">Pending..</span>
+                      <span className="bg-yellow-100 text-yellow-800 px-1 rounded-sm">Pending..</span>
                     ) : (
                       quote.pendingQuotes || "N/A"
                     )}

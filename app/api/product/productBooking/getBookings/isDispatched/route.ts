@@ -14,6 +14,9 @@ export async function GET() {
         buyerId: "5abd8eff-fb43-47d9-9a61-69291f3e5b42",
         isDispatched: true,
         isDelivered: false
+      },
+      include: {
+        product: true
       }
     });
 

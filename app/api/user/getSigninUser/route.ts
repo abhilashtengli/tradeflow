@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 //GetUser
 export async function GET() {
-  const id = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //change it the end
+  const id = "5abd8eff-fb43-47d9-9a61-69291f3e5b42"; //change it the end
 
   try {
     const user = await prisma.user.findUnique({
@@ -17,8 +17,7 @@ export async function GET() {
         name: true,
         email: true,
         role: true,
-        country: true,
-        
+        country: true
       }
     });
 
@@ -26,7 +25,7 @@ export async function GET() {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ data : user }, { status: 200 });
+    return NextResponse.json({ data: user }, { status: 200 });
   } catch (err) {
     return NextResponse.json({
       error: err,

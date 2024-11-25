@@ -1,11 +1,14 @@
-import React from 'react'
+import { baseUrl } from "@/app/config";
+import axios from "axios";
+import ClientComponent from "./clientComponent/page";
 
-const page = () => {
+export default async function page() {
+  const response = await axios.get(`${baseUrl}/user/getSigninUser`);
+  const data = response.data.data;
+
   return (
     <div>
-      buyer profile
+      <ClientComponent data={data} />
     </div>
-  )
+  );
 }
-
-export default page

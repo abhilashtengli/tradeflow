@@ -25,7 +25,7 @@ const Sidebar = () => {
           <Link
             href="/buyer/dashboard"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/seller/dashboard"
+              "/buyer/dashboard"
             )
               ? "bg-gray-200"
               : ""}`}
@@ -36,7 +36,7 @@ const Sidebar = () => {
           <Link
             href="/buyer/quotations"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/seller/quotations"
+              "/buyer/quotations"
             )
               ? "bg-gray-200"
               : ""}`}
@@ -47,7 +47,7 @@ const Sidebar = () => {
           <Link
             href="/buyer/productbookings"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/seller/productbookings"
+              "/buyer/productbookings"
             )
               ? "bg-gray-200"
               : ""}`}
@@ -59,7 +59,7 @@ const Sidebar = () => {
           <Link
             href="/buyer/profile"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/seller/profile"
+              "/buyer/profile"
             )
               ? "bg-gray-200"
               : ""}`}

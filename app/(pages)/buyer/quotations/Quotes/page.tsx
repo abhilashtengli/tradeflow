@@ -169,8 +169,8 @@ export default function QuotationSection({ sent, received }: QuoteProps) {
     <div className="container mx-auto p-6">
       <Tabs defaultValue="requested" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="requested">Requested Quotes</TabsTrigger>
-          <TabsTrigger value="sent">Sent Quotes</TabsTrigger>
+          <TabsTrigger value="requested">Requested Quotations</TabsTrigger>
+          <TabsTrigger value="sent">Received Quotations</TabsTrigger>
         </TabsList>
         <TabsContent value="requested">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">

@@ -7,7 +7,8 @@ const validateInput = z.object({
   shippingAddress: z.string(),
   productId: z.string(),
   quantity: z.number(),
-  buyerConfirm: z.boolean()
+  buyerConfirm: z.boolean(),
+  productQuoteId: z.string()
 });
 
 const validateUpdateInput = z.object({
@@ -18,10 +19,15 @@ const validateUpdateInput = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  console.log("reached be booking");
+
   try {
-    const buyerId = request.headers.get("x-user-id") as string;
+    // const buyerId = request.headers.get("x-user-id") as string;
+    const buyerId = "5abd8eff-fb43-47d9-9a61-69291f3e5b42";
 
     const body = await request.json();
+    console.log(body);
+
     const result = validateInput.safeParse(body);
 
     if (!result.success) {
@@ -52,8 +58,17 @@ export async function POST(request: NextRequest) {
         buyerConfirm: body.buyerConfirm
       }
     });
+    const dataUpdate = await prisma.productQuote.update({
+      where: {
+        id: body.productQuoteId
+      },
+      data: {
+        buyerBookingConfirmed: true
+      }
+    });
     return NextResponse.json({
-      data: data
+      data: data,
+      quote: dataUpdate
     });
   } catch (err) {
     return NextResponse.json({

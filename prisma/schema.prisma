@@ -148,6 +148,7 @@ model ProductQuote {
   price                     Float?
   noOfDaystoDeliver         Int?
   pendingQuotes             Boolean       @default(true)
+  buyerBookingConfirmed     Boolean       @default(false)
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt @default(now())
 }

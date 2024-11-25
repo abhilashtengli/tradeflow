@@ -56,13 +56,25 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
-    const buyerId = (await request.headers.get("x-user-id")) as string;
+    // const buyerId = (await request.headers.get("x-user-id")) as string;
+    const buyerId = "5abd8eff-fb43-47d9-9a61-69291f3e5b42";
 
     const QuoteData = await prisma.productQuote.findMany({
       where: {
-        buyerId: buyerId
+        buyerId: buyerId,
+        pendingQuotes: true
+      },
+      include: {
+        product: true,
+        Seller: {
+          select: {
+            name: true,
+            country: true
+          }
+        }
       }
     });
     return NextResponse.json({

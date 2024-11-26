@@ -56,15 +56,19 @@ export default function TransporterDashboard({
   return (
     <div className="container mx-auto py-4 px-5">
       <h1 className="text-3xl font-bold mb-6">Transportation Requests</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {requests.map(request =>
-          <TransportationCard
-            key={request.id}
-            request={request}
-            onAccept={() => handleAccept(request.id)}
-          />
-        )}
-      </div>
+      {requests && requests.length > 0
+        ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {requests.map(request =>
+              <TransportationCard
+                key={request.id}
+                request={request}
+                onAccept={() => handleAccept(request.id)}
+              />
+            )}
+          </div>
+        : <div className="text-2xl text-zinc-700">
+            There are no bookings as of now...
+          </div>}
     </div>
   );
 }

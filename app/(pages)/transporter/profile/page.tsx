@@ -1,7 +1,15 @@
-import React from "react";
+import { baseUrl } from "@/app/config";
+import axios from "axios";
+import ClientComponent from "./clientComponent/page";
 
-const Profile = () => {
-  return <div>page</div>;
-};
+export default async function page() {
+  
+  const response = await axios.get(`${baseUrl}/usertransporter/user`);
+  const data = response.data.data;
 
-export default Profile;
+  return (
+    <div>
+      <ClientComponent data={data} />
+    </div>
+  );
+}

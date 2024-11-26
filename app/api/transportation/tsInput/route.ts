@@ -42,6 +42,20 @@ export async function PATCH(request: NextRequest) {
       error: result.error.errors
     });
   }
+  const res = await prisma.transportation.findUnique({
+    where: {
+      id: body.transportationId
+    },
+    select: {
+      accepted: true
+    }
+  });
+
+  if (res?.accepted === true) {
+    return NextResponse.json({
+      message : "This request is already accepted by someone"
+    })
+  }
 
   const update = await prisma.transportation.update({
     where: {
@@ -55,7 +69,8 @@ export async function PATCH(request: NextRequest) {
       dispatched: body.dispatched !== undefined ? body.dispatched : undefined,
       delivered: body.delivered !== undefined ? body.delivered : undefined,
       accepted: body.accepted !== undefined ? body.accepted : undefined,
-      paymentStatus: body.paymentStatus !== undefined ? body.paymentStatus : undefined
+      paymentStatus:
+        body.paymentStatus !== undefined ? body.paymentStatus : undefined
     }
   });
 

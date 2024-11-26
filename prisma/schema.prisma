@@ -96,7 +96,7 @@ model UserTransporter {
   companyName    String?
   country        String?
   transportation Transportation[] 
-  companyAddres  String?
+  companyAddress  String?
 }
 
 model Product{

@@ -7,12 +7,16 @@ const prisma = new PrismaClient();
 export async function PATCH(request: NextRequest) {
   const body = await request.json();
 
-  const userId = request.headers.get("x-user-id") as string;
+  // const userId = request.headers.get("x-user-id") as string;
+  const userId = "30f0e50e-99da-456c-b873-b19565c451b0";
 
-  const { success } = updateUserTs.safeParse(body);
+  const result = updateUserTs.safeParse(body);
 
-  if (!success) {
-    return NextResponse.json("Invalid parameters given");
+  if (!result.success) {
+    return NextResponse.json({
+      message: "Invalid parameters given",
+      error: result.error.errors
+    });
   }
   const userTsUpdated = await prisma.userTransporter.update({
     where: {
@@ -23,8 +27,8 @@ export async function PATCH(request: NextRequest) {
       password: body.password !== undefined ? body.password : undefined,
       companyName:
         body.companyName !== undefined ? body.companyName : undefined,
-      companyAddres:
-        body.companyAddres !== undefined ? body.companyAddres : undefined,
+      companyAddress:
+        body.companyAddress !== undefined ? body.companyAddress : undefined,
       country: body.country !== undefined ? body.country : undefined
     }
   });

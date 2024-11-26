@@ -170,24 +170,25 @@ model ProductQuote {
 }
 
 model Transportation {
-  id                 String          @id @default(uuid())
-  type               TruckType        
-  load               Int
-  loadUnit           LoadUnit
-  origin             String          // Pickup location
-  destination        String          // Port or destination location
-  distance           Int             @default(0)
-  price              Float           @default(0)
-  user               User            @relation(fields: [userId], references: [id])
+  id                 String           @id @default(uuid())
+  type               TruckType         
+  load               Int 
+  loadUnit           LoadUnit 
+  origin             String           // Pickup location
+  destination        String           // Port or destination location
+  distance           Int              @default(0)
+  price              Float            @default(0)
+  user               User             @relation(fields: [userId], references: [id])
   userId             String             // Foreign key to track which user booked the transport
   transporter        UserTransporter? @relation( fields: [transporterId], references: [id])
   transporterId      String?          @default("not yet accepted ")
-  userConfirmBooking Boolean         @default(false)
-  accepted           Boolean         @default(false)
-  dispatched         Boolean         @default(false)
-  delivered          Boolean         @default(false)
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
+  userConfirmBooking Boolean          @default(false)
+  accepted           Boolean          @default(false)
+  paymentStatus      PaymentStatus    @default(PENDING)
+  dispatched         Boolean          @default(false)
+  delivered          Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 model FreightForwarder {

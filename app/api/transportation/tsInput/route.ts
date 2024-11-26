@@ -3,11 +3,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const tsValidation = z.object({
-  type: z.string().optional(),
-  load: z.string().optional(),
+  type: z
+    .enum([
+      "Flatbed_Truck",
+      "Box_Truck",
+      "Pickup_Truck",
+      "Refrigerated_Truck",
+      "Car_Carrier_Truck",
+      "Tow_Truck",
+      "Heavy_Hauler",
+      "Curtain_Side_Truck"
+    ])
+    .optional(),
+  load: z.number().optional(),
   transportationId: z.string(),
   dispatched: z.boolean().optional(),
   delivered: z.boolean().optional(),
+  paymentStatus: z
+    .enum(["PENDING", "PAID", "PARTIALLY_PAID", "CANCELLED"])
+    .optional(),
   accepted: z.boolean().optional()
 });
 
@@ -33,13 +47,15 @@ export async function PATCH(request: NextRequest) {
     where: {
       id: body.transportationId
     },
+
     data: {
       type: body.type !== undefined ? body.type : undefined,
-      load: body.laod !== undefined ? body.laod : undefined,
-      transporterId: tsId,
+      load: body.load !== undefined ? body.load : undefined,
+      transporterId: tsId !== undefined ? tsId : undefined,
       dispatched: body.dispatched !== undefined ? body.dispatched : undefined,
       delivered: body.delivered !== undefined ? body.delivered : undefined,
-      accepted: body.accepted !== undefined ? body.accepted : undefined
+      accepted: body.accepted !== undefined ? body.accepted : undefined,
+      paymentStatus: body.paymentStatus !== undefined ? body.paymentStatus : undefined
     }
   });
 

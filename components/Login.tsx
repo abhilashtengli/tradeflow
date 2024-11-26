@@ -39,7 +39,7 @@ const Login = () => {
       } else if (userRole === "Seller") {
         redirect("/seller/dashboard");
       } else if (userRole === "Transporter") {
-        redirect("/tsdashboard");
+        redirect("/transporter/tsdashboard");
       } else if (userRole === "FreightForwarder") {
         redirect("/ffdashboard");
       }

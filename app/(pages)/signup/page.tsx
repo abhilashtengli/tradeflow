@@ -53,7 +53,7 @@ const Signup = () => {
         } else if (role === "Seller") {
           router.push("/seller/dashboard");
         } else if (role === "Transporter") {
-          router.push("/tsdashboard");
+          router.push("/transporter/tsdashboard");
         } else if (role === "FreightForwarder") {
           router.push("/ffdashboard");
         }

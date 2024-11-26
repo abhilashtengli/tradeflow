@@ -3,32 +3,35 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const tsValidation = z.object({
-  type: z.string(),
-  load: z.string(),
-  transporterId: z.string(),
-  dispatched: z.boolean(),
-  delivered: z.boolean(),
-  accepted: z.boolean()
+  type: z.string().optional(),
+  load: z.string().optional(),
+  transportationId: z.string(),
+  dispatched: z.boolean().optional(),
+  delivered: z.boolean().optional(),
+  accepted: z.boolean().optional()
 });
 
 const prisma = new PrismaClient();
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const tsId = request.headers.get("x-user-id") as string;
-  const body = await request.json();
-  const { id } = await params;
-  const { success } = tsValidation.safeParse(body);
+export async function PATCH(request: NextRequest) {
+  // const tsId = request.headers.get("x-user-id") as string;
+  const tsId = "30f0e50e-99da-456c-b873-b19565c451b0";
 
-  if (!success) {
-    return NextResponse.json({ message: "Invalid request" });
+  const body = await request.json();
+  console.log(body);
+
+  const result = tsValidation.safeParse(body);
+
+  if (!result.success) {
+    return NextResponse.json({
+      message: "Invalid request",
+      error: result.error.errors
+    });
   }
 
   const update = await prisma.transportation.update({
     where: {
-      id: id
+      id: body.transportationId
     },
     data: {
       type: body.type !== undefined ? body.type : undefined,

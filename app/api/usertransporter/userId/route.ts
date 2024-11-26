@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     select: {
       name: true,
       companyName: true,
+      companyAddres: true,
       email: true
     }
   });

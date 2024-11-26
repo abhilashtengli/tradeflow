@@ -4,11 +4,21 @@ import { z } from "zod";
 import axios from "axios";
 
 const tsValidation = z.object({
-  type: z.string(),
+  type: z.enum([
+    "Flatbed_Truck",
+    "Box_Truck",
+    "Pickup_Truck",
+    "Refrigerated_Truck",
+    "Car_Carrier_Truck",
+    "Tow_Truck",
+    "Heavy_Hauler",
+    "Curtain_Side_Truck"
+  ]),
   origin: z.string(),
   destination: z.string(),
   load: z.number(),
-  userId: z.string()
+  userId: z.string(),
+  loadUnit: z.enum(["tons", "Kilograms", "Pounds"])
 });
 
 const prisma = new PrismaClient();
@@ -53,7 +63,9 @@ export async function POST(request: NextRequest) {
         load: body.load,
         userId: body.userId,
         distance,
-        price: price
+        price: price,
+        userConfirmBooking: true,
+        loadUnit: body.loadUnit
       },
       select: {
         id: true,

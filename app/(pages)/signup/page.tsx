@@ -55,7 +55,7 @@ const Signup = () => {
         } else if (role === "Transporter") {
           router.push("/transporter/tsdashboard");
         } else if (role === "FreightForwarder") {
-          router.push("/ffdashboard");
+          router.push("/freightForwarder/ffdashboard");
         }
       } else {
         console.log("Error signing in after signup:", res?.error);

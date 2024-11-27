@@ -10,6 +10,18 @@ enum ContainerType {
 const validateInput = z.object({
   origin: z.string(),
   destination: z.string(),
+  product: z.string(),
+  productUnit: z.enum([
+    "pcs",
+    "box",
+    "kg",
+    "grams",
+    "tons",
+    "cm",
+    "meter",
+    "inche",
+    "feet"
+  ]),
   departureDate: z.date().refine(date => date > new Date()),
   load: z.number().min(1).max(28),
   noOfContainers: z.number().min(1),
@@ -49,5 +61,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: err });
   }
 }
-
-

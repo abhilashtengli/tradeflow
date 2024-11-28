@@ -49,13 +49,13 @@ const Signup = () => {
       if (res?.ok) {
         console.log("okkk.");
         if (role === "Buyer") {
-          router.push("/buyer/dashboard");
+          router.push("/buyer/profile");
         } else if (role === "Seller") {
-          router.push("/seller/dashboard");
+          router.push("/seller/profile");
         } else if (role === "Transporter") {
-          router.push("/transporter/tsdashboard");
+          router.push("/transporter/profile");
         } else if (role === "FreightForwarder") {
-          router.push("/freightForwarder/ffdashboard");
+          router.push("/freightForwarder/profile");
         }
       } else {
         console.log("Error signing in after signup:", res?.error);

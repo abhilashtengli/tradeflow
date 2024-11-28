@@ -41,7 +41,7 @@ const Login = () => {
       } else if (userRole === "Transporter") {
         redirect("/transporter/tsdashboard");
       } else if (userRole === "FreightForwarder") {
-        redirect("/freightForwarder/ffdashboard");
+        redirect("/freightForwarder/quotation");
       }
     }
   };

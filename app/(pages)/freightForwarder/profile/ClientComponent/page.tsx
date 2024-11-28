@@ -37,10 +37,11 @@ export default function ClientComponent({ data }: { data: Data }) {
     if (!submissionData.password) {
       delete submissionData.password; // Now TypeScript won't complain
     }
-
+    console.log(submissionData);
+    
     try {
       const response = await axios.patch(
-        `${baseUrl}/usertransporter`,
+        `${baseUrl}/freight/freightForwarder`,
         submissionData
       );
       console.log(response.data);

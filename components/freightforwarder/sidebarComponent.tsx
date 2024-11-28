@@ -23,9 +23,9 @@ const Sidebar = () => {
         </div>
         <nav className="mt-6">
           <Link
-            href="/freightForwarder/ffdashboard"
+            href="/freightForwarder/quotation"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/transporter/tsdashboard"
+              "/freightForwarder/quotation"
             )
               ? "bg-gray-200"
               : ""}`}
@@ -34,9 +34,9 @@ const Sidebar = () => {
             Requested Quotations
           </Link>
           <Link
-            href="/transporter/Bookings"
+            href="/freightForwarder/bookings"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/transporter/Bookings"
+              "/freightForwarder/bookings"
             )
               ? "bg-gray-200"
               : ""}`}
@@ -46,9 +46,9 @@ const Sidebar = () => {
           </Link>
 
           <Link
-            href="/transporter/profile"
+            href="/freightForwarder/profile"
             className={`block py-2 px-4 text-gray-700 hover:bg-gray-100 ${isActive(
-              "/transporter/profile"
+              "/freightForwarder/profile"
             )
               ? "bg-gray-200"
               : ""}`}

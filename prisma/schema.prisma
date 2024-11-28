@@ -201,7 +201,6 @@ model FreightForwarder {
   password        String
   freightQuote    FreightQuote[]
   country         String?
-  location        String?   // Based on country or region
   freightBookings   FreightBooking[]
 }
 

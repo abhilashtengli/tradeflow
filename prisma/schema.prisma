@@ -85,6 +85,7 @@ productQuoteAsBuyer  ProductQuote[]  @relation("ProductQuoteBuyer")
 productQuoteAsSeller ProductQuote[] @relation("ProductQuoteSeller")
 ProductBookingAsSeller       ProductBooking[] @relation("productBuyer")
 productBookingAsBuyer ProductBooking[] @relation("productSeller")
+freightQuote          FreightQuote[]
 }
 
 model UserTransporter {
@@ -236,10 +237,12 @@ model FreightQuote  {
   freightForwarderId   String 
   freightBooking       FreightBooking       @relation(fields: [bookingId], references: [id])
   bookingId            String
-  price                Float
+  user                 User                 @relation(fields: [userId], references: [id])
+  userId               String
+  price                Float?
   isAccepted           Boolean?
   currency             Currency?
-  pendingQuotes        Boolean              @default(true)
+  pendingQuote        Boolean              @default(true)
 
 }
 

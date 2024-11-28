@@ -1,41 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-const validateQuoteInput = z.object({
-  bookingId: z.string(),
-  price: z.number()
-});
+
 const validateQuoteUpdateInput = z.object({
   freightQuoteId: z.string(),
   price: z.number()
 });
 const prisma = new PrismaClient();
-
-export async function POST(request: NextRequest) {
-  try {
-    const userId = request.headers.get("x-user-id") as string;
-    const body = await request.json();
-
-    const { success } = validateQuoteInput.safeParse(body);
-
-    if (!success) {
-      return NextResponse.json({ message: "Invalid inputs" });
-    }
-
-    const data = await prisma.freightQuote.create({
-      data: {
-        freightForwarderId: userId,
-        bookingId: body.bookingId,
-        price: body.price
-      }
-    });
-    return NextResponse.json({
-      data: data
-    });
-  } catch (err) {
-    return NextResponse.json({ error: err });
-  }
-}
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -61,5 +32,27 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (err) {
     return NextResponse.json({ error: err });
+  }
+}
+
+//get freight quote requests
+export async function GET() {
+  const ffId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
+
+  try {
+    const response = await prisma.freightQuote.findMany({
+      where: {
+        freightForwarderId: ffId
+      }
+    });
+
+    return NextResponse.json({
+      data: response
+    });
+  } catch (err) {
+    return NextResponse.json({
+      message: "Somethings went wrong! Could not get the Quotes",
+      error: err
+    });
   }
 }

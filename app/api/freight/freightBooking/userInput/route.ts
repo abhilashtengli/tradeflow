@@ -51,7 +51,8 @@ export async function POST(request: NextRequest) {
         userId: userId,
         load: body.load,
         noOfContainers: body.noOfContainers,
-        containerType: body.containerType
+        containerType: body.containerType,
+        productUnit: body.productUnit
       }
     });
     return NextResponse.json({

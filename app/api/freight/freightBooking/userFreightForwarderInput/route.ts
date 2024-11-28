@@ -7,13 +7,15 @@ enum ContainerType {
 }
 
 const validateInput = z.object({
-  departureDate: z.date().refine(date => date > new Date()),
-  arrivalDate: z.date().refine(date => date > new Date()),
-  load: z.number().min(1).max(28),
-  noOfContainers: z.number().min(1),
-  price: z.number(),
-  containerType: z.enum([ContainerType.Type_20, ContainerType.Type_40]),
-  freightIsAccepted: z.boolean(),
+  departureDate: z.date().refine(date => date > new Date()).optional(),
+  arrivalDate: z.date().refine(date => date > new Date()).optional(),
+  load: z.number().min(1).max(28).optional(),
+  noOfContainers: z.number().min(1).optional(),
+  price: z.number().optional(),
+  containerType: z
+    .enum([ContainerType.Type_20, ContainerType.Type_40])
+    .optional(),
+  freightIsAccepted: z.boolean().optional(),
   bookingId: z.string()
 });
 

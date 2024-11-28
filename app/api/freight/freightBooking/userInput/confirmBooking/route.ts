@@ -27,6 +27,18 @@ export async function PATCH(request: NextRequest) {
         message: "Invalid inputs provided"
       });
     }
+    const freightQuote = await prisma.freightQuote.findUnique({
+      where: {
+        id: body.freightQuoteId
+      }
+    });
+    const ffId = freightQuote?.freightForwarderId;
+    if (!ffId) {
+      return NextResponse.json({
+        message: "No freight forwarder found"
+      });
+    }
+
     await prisma.$transaction(async () => {
       await prisma.freightQuote.update({
         where: {
@@ -41,7 +53,8 @@ export async function PATCH(request: NextRequest) {
           id: body.bookingId
         },
         data: {
-          userConfirm: body.userConfirm
+          userConfirm: body.userConfirm,
+          freightForwarderId: ffId
         }
       });
     });

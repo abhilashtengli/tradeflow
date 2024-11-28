@@ -207,8 +207,8 @@ model FreightForwarder {
 
 model FreightBooking {
   id                  String                  @id @default(uuid())
-  freightForwarder    FreightForwarder        @relation(fields: [freightForwarderId], references: [id])
-  freightForwarderId  String                  @default("not yet accepted ")
+  freightForwarder    FreightForwarder?       @relation(fields: [freightForwarderId], references: [id])
+  freightForwarderId  String?                 @default("not yet accepted ")
   user                User                    @relation(fields: [userId], references: [id])
   userId              String
   containerType       ContainerType   
@@ -233,8 +233,8 @@ model FreightBooking {
 
 model FreightQuote  {
   id                   String               @id @default(uuid()) 
-  freightForwarder     FreightForwarder     @relation(fields: [freightForwarderId], references: [id])
-  freightForwarderId   String 
+  freightForwarder     FreightForwarder?     @relation(fields: [freightForwarderId], references: [id])
+  freightForwarderId   String? 
   freightBooking       FreightBooking       @relation(fields: [bookingId], references: [id])
   bookingId            String
   user                 User                 @relation(fields: [userId], references: [id])
@@ -243,6 +243,5 @@ model FreightQuote  {
   isAccepted           Boolean?
   currency             Currency?
   pendingQuote        Boolean              @default(true)
-
 }
 

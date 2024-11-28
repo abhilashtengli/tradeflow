@@ -4,7 +4,8 @@ import { z } from "zod";
 
 const validateQuoteUpdateInput = z.object({
   freightQuoteId: z.string(),
-  price: z.number()
+  price: z.number(),
+  currency: z.enum(["USD", "EURO", "GBP", "INR", "RUB", "CNY"])
 });
 const prisma = new PrismaClient();
 
@@ -12,10 +13,13 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { success } = validateQuoteUpdateInput.safeParse(body);
+    const result = validateQuoteUpdateInput.safeParse(body);
 
-    if (!success) {
-      return NextResponse.json({ message: "Invalid inputs" });
+    if (!result.success) {
+      return NextResponse.json({
+        message: "Invalid inputs",
+        error: result.error.errors
+      });
     }
 
     const data = await prisma.freightQuote.update({
@@ -23,7 +27,9 @@ export async function PATCH(request: NextRequest) {
         id: body.freightQuoteId
       },
       data: {
-        price: body.price
+        price: body.price,
+        currency: body.currency,
+        pendingQuote: false
       }
     });
     return NextResponse.json({
@@ -42,9 +48,21 @@ export async function GET() {
   try {
     const response = await prisma.freightQuote.findMany({
       where: {
-        freightForwarderId: ffId
+        freightForwarderId: ffId,
+        pendingQuote: true
+      },
+      include: {
+        freightBooking: true,
+        user: {
+          select: {
+            name: true,
+            country: true,
+            email: true
+          }
+        }
       }
     });
+    console.log(response);
 
     return NextResponse.json({
       data: response

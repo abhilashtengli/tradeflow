@@ -1,6 +1,5 @@
 import { baseUrl } from "@/app/config";
 import axios from "axios";
-import { error } from "console";
 import React from "react";
 import BookingPage from "./Booking";
 

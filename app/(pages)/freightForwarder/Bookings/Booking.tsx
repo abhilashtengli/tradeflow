@@ -22,7 +22,7 @@ export type Booking = {
   price?: number;
   containerType?: "Type_20" | "Type_40";
   freightIsAccepted: boolean;
-  isDispatched: boolean;
+  dispatched: boolean;
   isDelivered: boolean;
   paymentStatus: string;
 };
@@ -37,16 +37,16 @@ export default function BookingPage({ bookings }: { bookings: Booking[] }) {
       )
     );
   };
-  console.log(allBookings);
+  // console.log(allBookings);
 
   const pendingBookings = allBookings.filter(
     booking => !booking.freightIsAccepted
   );
   const confirmedBookings = allBookings.filter(
-    booking => booking.freightIsAccepted && !booking.isDispatched
+    booking => booking.freightIsAccepted && !booking.dispatched
   );
   const dispatchedBookings = allBookings.filter(
-    booking => booking.isDispatched && !booking.isDelivered
+    booking => booking.dispatched && !booking.isDelivered
   );
   const deliveredBookings = allBookings.filter(booking => booking.isDelivered);
 

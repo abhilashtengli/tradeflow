@@ -74,14 +74,19 @@ export function ConfirmedBookings({
 
   const handleDispatch = async (booking: Booking) => {
     try {
+      const data = {
+        bookingId: booking.id,
+        dispatched : true
+      }
       const response = await axios.patch(
-        `${baseUrl}/freight/booking/${booking.id}`,
-        {
-          isDispatched: true
-        }
+        `${baseUrl}/freight/freightBooking/userFreightForwarderInput/freightDispatched`,
+        data
       );
+      console.log(response.data);
+      
       if (response.status === 200) {
-        updateBooking({ ...booking, isDispatched: true });
+        updateBooking({ ...booking, dispatched
+: true });
       }
     } catch (error) {
       console.error("Error dispatching booking:", error);

@@ -18,11 +18,13 @@ export type Booking = {
   arrivalDate?: Date;
   load?: number;
   noOfContainers?: number;
+  currency?: string;
   price?: number;
   containerType?: "Type_20" | "Type_40";
   freightIsAccepted: boolean;
   isDispatched: boolean;
   isDelivered: boolean;
+  paymentStatus: string;
 };
 
 export default function BookingPage({ bookings }: { bookings: Booking[] }) {
@@ -35,6 +37,7 @@ export default function BookingPage({ bookings }: { bookings: Booking[] }) {
       )
     );
   };
+  console.log(allBookings);
 
   const pendingBookings = allBookings.filter(
     booking => !booking.freightIsAccepted

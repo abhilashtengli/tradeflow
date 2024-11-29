@@ -228,6 +228,7 @@ model FreightBooking {
   freightIsAccepted   Boolean                 @default(false)
   userConfirm         confirmFreightBooking?            
   createdAt           DateTime                @default(now())
+  currency            Currency?
   updatedAt           DateTime                @updatedAt
 }  
 

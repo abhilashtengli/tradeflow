@@ -15,12 +15,18 @@ export function PendingBookings({
 }: PendingBookingsProps) {
   const handleAccept = async (booking: Booking) => {
     try {
+      const data = {
+        freightIsAccepted: true,
+        bookingId: booking.id
+      };
+      console.log(data);
+
       const response = await axios.patch(
-        `${baseUrl}/freight/booking/${booking.id}`,
-        {
-          freightIsAccepted: true
-        }
+        `${baseUrl}/freight/freightBooking/userFreightForwarderInput`,
+        data
       );
+      console.log(response.data);
+
       if (response.status === 200) {
         updateBooking({ ...booking, freightIsAccepted: true });
       }

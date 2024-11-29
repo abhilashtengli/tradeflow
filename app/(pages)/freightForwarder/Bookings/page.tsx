@@ -13,7 +13,7 @@ const page = async () => {
     );
     Bookings = responsePending.data.data;
 
-    // console.log(pendinBookings);
+    console.log(Bookings);
   } catch (err) {
     console.log({ message: "Could not fetch data", error: err });
   }

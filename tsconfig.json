@@ -24,7 +24,7 @@
       "@components/*": ["components/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/freight/freightForwarder/getAll"],
   "exclude": ["node_modules"],
   "moduleResolution": "node", // Ensure modules are resolved in a Node.js-compatible way
 

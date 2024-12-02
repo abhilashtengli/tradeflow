@@ -18,7 +18,7 @@ const page = async () => {
 
   return <div>
       {/* <FreightFowrderComponent /> */}
-      n <FindForwarder />
+       <FindForwarder />
     </div>;
 };
 

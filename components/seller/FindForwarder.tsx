@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import { FreightForwarderCard } from "./FreightForwarderCard";
 import { FreightBookingForm, FreightBookingData } from "./FreightBookingForm";

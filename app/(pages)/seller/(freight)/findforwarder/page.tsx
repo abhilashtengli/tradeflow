@@ -2,6 +2,7 @@ import React from "react";
 import FreightFowrderComponent from "./FfComponent.tsx/page";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { FindForwarder } from "@/components/seller/FindForwarder";
 
 const page = async () => {
   let data = [];
@@ -15,11 +16,10 @@ const page = async () => {
   }
   console.log(data);
 
-  return (
-    <div>
-      <FreightFowrderComponent />
-    </div>
-  );
+  return <div>
+      {/* <FreightFowrderComponent /> */}
+      n <FindForwarder />
+    </div>;
 };
 
 export default page;

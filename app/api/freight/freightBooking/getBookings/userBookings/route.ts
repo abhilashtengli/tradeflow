@@ -10,7 +10,8 @@ export async function GET() {
   try {
     const response = await prisma.freightBooking.findMany({
       where: {
-        userId: userId
+        userId: userId,
+        freightForwarderId: null
       }
     });
     return NextResponse.json({

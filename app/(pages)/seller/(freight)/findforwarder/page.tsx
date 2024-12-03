@@ -1,25 +1,31 @@
 import React from "react";
-import FreightFowrderComponent from "./FfComponent.tsx/page";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
 import { FindForwarder } from "@/components/seller/FindForwarder";
 
 const page = async () => {
   let data = [];
+  let bookingDetails = [];
   try {
     const response = await axios.get(
       `${baseUrl}/freight/freightForwarder/getAll`
     );
     data = response.data.data;
+
+    const bookings = await axios.get(
+      `${baseUrl}/freight/freightBooking/getBookings/userBookings`
+    );
+    bookingDetails = bookings.data.data;
   } catch (err) {
     console.log("could not fetch Users", err);
   }
-  console.log(data);
+  console.log(bookingDetails);
 
-  return <div>
-      {/* <FreightFowrderComponent /> */}
-       <FindForwarder />
-    </div>;
+  return (
+    <div>
+      <FindForwarder users={data} bookings={bookingDetails} />
+    </div>
+  );
 };
 
 export default page;

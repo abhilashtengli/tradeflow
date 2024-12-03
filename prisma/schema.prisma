@@ -208,12 +208,13 @@ model FreightForwarder {
 model FreightBooking {
   id                  String                  @id @default(uuid())
   freightForwarder    FreightForwarder?       @relation(fields: [freightForwarderId], references: [id])
-  freightForwarderId  String?                 @default("not yet accepted ")
+  freightForwarderId  String?                
   user                User                    @relation(fields: [userId], references: [id])
   userId              String
   containerType       ContainerType   
   noOfContainers      Int      
   load                Int                  //load in tons
+  loadUnit            Unit                  @default(tons)
   origin              String    
   destination         String 
   product             String?

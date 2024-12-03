@@ -22,8 +22,15 @@ const validateInput = z.object({
     "inche",
     "feet"
   ]),
-  departureDate: z.date().refine(date => date > new Date()),
+  departureDate: z
+    .string()
+    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
+    .refine(
+      date => new Date(date) >= new Date(),
+      "Departure date cannot be in the past"
+    ),
   load: z.number().min(1).max(28),
+  loadUnit: z.enum(["pcs", "box", "kg", "tons", "meter"]),
   noOfContainers: z.number().min(1),
   containerType: z.enum([ContainerType.Type_20, ContainerType.Type_40])
 });
@@ -32,33 +39,51 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id") as string;
+    // const userId = request.headers.get("x-user-id") as string;
+    const userSellerId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
 
     const body = await request.json();
+    console.log(body);
 
-    const { success } = await validateInput.safeParse(body);
+    const result = await validateInput.safeParse(body);
 
-    if (!success) {
+    if (!result.success) {
+      console.log(result.error);
       return NextResponse.json({
-        message: "Invalid inputs provided"
+        message: "Invalid inputs provided",
+        error: result.error.errors
       });
     }
+
+    const parsedBody = {
+      ...body,
+      departureDate: body.departureDate
+        ? new Date(body.departureDate)
+        : undefined
+    };
+
+    console.log(parsedBody);
+
     const data = await prisma.freightBooking.create({
       data: {
         origin: body.origin,
         destination: body.destination,
-        departureDate: body.departureDate,
-        userId: userId,
+        departureDate: parsedBody.departureDate,
+        userId: userSellerId,
         load: body.load,
         noOfContainers: body.noOfContainers,
         containerType: body.containerType,
-        productUnit: body.productUnit
+        productUnit: body.productUnit,
+        loadUnit: body.loadUnit,
+        product: body.product,
+        freightForwarderId: null
       }
     });
     return NextResponse.json({
       data: data
     });
   } catch (err) {
+    console.error("Prisma Error Details:", JSON.stringify(err, null, 2));
     return NextResponse.json({ error: err });
   }
 }

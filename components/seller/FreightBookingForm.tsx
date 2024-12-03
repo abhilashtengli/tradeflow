@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,31 +9,46 @@ import {
   DialogTitle,
   DialogTrigger
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import axios from "axios";
+import { baseUrl } from "@/app/config";
 
 interface FreightBookingFormProps {
   onSubmit: (data: FreightBookingData) => void;
 }
 
 export interface FreightBookingData {
+  id: string;
   origin: string;
   destination: string;
   departureDate: string;
-  userId: string;
   load: string;
+  loadUnit: string;
   noOfContainers: string;
   containerType: string;
+  product: string;
   productUnit: string;
 }
 
 export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [formData, setFormData] = useState<FreightBookingData>({
+    id: "",
     origin: "",
     destination: "",
     departureDate: "",
-    userId: "",
     load: "",
+    loadUnit: "",
     noOfContainers: "",
     containerType: "",
+    product: "",
     productUnit: ""
   });
 
@@ -41,15 +56,46 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const handleSelectChange = (name: string) => (value: string) => {
+    setFormData({ ...formData, [name]: value });
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data = {
+      origin: formData.origin,
+      destination: formData.destination,
+      product: formData.product,
+      productUnit: formData.productUnit,
+      departureDate: formData.departureDate
+        ? formData.departureDate.toString()
+        : null,
+      load: Number(formData.load),
+      loadUnit: formData.loadUnit,
+      noOfContainers: Number(formData.noOfContainers),
+      containerType: formData.containerType
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}/freight/freightBooking/userInput`,
+        data
+      );
+
+      console.log(response.data);
+      onSubmit(formData);
+
+      setOpen(false);
+    } catch (err) {
+      console.log("Could not set Freight Booking details", err);
+    }
+  };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Freight Booking Details</Button>
+        <Button variant="outline" ref={triggerRef}>
+          Freight Booking Details
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -89,16 +135,6 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="userId">User ID</Label>
-            <Input
-              id="userId"
-              name="userId"
-              value={formData.userId}
-              onChange={handleChange}
-              required
-            />
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="load">Load</Label>
@@ -111,6 +147,26 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="loadUnit">Load Unit</Label>
+              <Select
+                onValueChange={handleSelectChange("loadUnit")}
+                value={formData.loadUnit}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pcs">pcs</SelectItem>
+                  <SelectItem value="box">box</SelectItem>
+                  <SelectItem value="kg">kg</SelectItem>
+                  <SelectItem value="tons">tons</SelectItem>
+                  <SelectItem value="meter">meter</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
               <Label htmlFor="noOfContainers">No. of Containers</Label>
               <Input
                 id="noOfContainers"
@@ -121,29 +177,55 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
                 required
               />
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="containerType">Container Type</Label>
-              <Input
-                id="containerType"
-                name="containerType"
+              <Select
+                onValueChange={handleSelectChange("containerType")}
                 value={formData.containerType}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Type_20">20 feet</SelectItem>
+                  <SelectItem value="Type_40">40 feet</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="productName">Product Name</Label>
+              <Input
+                id="productName"
+                name="productName"
+                value={formData.product}
                 onChange={handleChange}
                 required
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="productUnit">Product Unit</Label>
-              <Input
-                id="productUnit"
-                name="productUnit"
+              <Select
+                onValueChange={handleSelectChange("productUnit")}
                 value={formData.productUnit}
-                onChange={handleChange}
-                required
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pcs">pcs</SelectItem>
+                  <SelectItem value="box">box</SelectItem>
+                  <SelectItem value="kg">kg</SelectItem>
+                  <SelectItem value="grams">grams</SelectItem>
+                  <SelectItem value="tons">tons</SelectItem>
+                  <SelectItem value="cm">cm</SelectItem>
+                  <SelectItem value="meter">meter</SelectItem>
+                  <SelectItem value="inch">inch</SelectItem>
+                  <SelectItem value="feet">feet</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
           <Button type="submit">Submit</Button>
         </form>
       </DialogContent>

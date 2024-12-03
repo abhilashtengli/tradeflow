@@ -1,52 +1,52 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { FreightForwarderCard } from "./FreightForwarderCard";
 import { FreightBookingForm, FreightBookingData } from "./FreightBookingForm";
 import { RequestQuoteCard } from "./RequestQuoteCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import axios from "axios";
+import { baseUrl } from "@/app/config";
 
-// Mock data for freight forwarders
-const freightForwarders = [
-  {
-    id: "ff1",
-    name: "John Doe",
-    email: "john@example.com",
-    companyName: "Fast Freight Ltd",
-    companyAddress: "123 Shipping Lane, Port City",
-    country: "USA"
-  }
-  // Add more freight forwarders as needed
-];
+type Users = {
+  id: string;
+  name: string;
+  email: string;
+  companyName: string;
+  companyAddress: string;
+  country: string;
+};
 
-export function FindForwarder() {
+export function FindForwarder({
+  users,
+  bookings
+}: {
+  users: Users[];
+  bookings: FreightBookingData[];
+}) {
   const [selectedForwarder, setSelectedForwarder] = useState<string | null>(
     null
   );
-  const [
-    bookingDetails,
-    setBookingDetails
-  ] = useState<FreightBookingData | null>(null);
-  const [bookingIds, setBookingIds] = useState<string[]>([
-    "B001",
-    "B002",
-    "B003"
-  ]); // Mock booking IDs
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [freightForwarders, setFreightForwarders] = useState<Users[]>(
+    users || []
+  );
+  const [bookingDetails, setBookingDetails] = useState<FreightBookingData[]>(
+    bookings || []
+  );
+  const [isRequestQuoteOpen, setIsRequestQuoteOpen] = useState(false);
 
   const handleRequestQuote = (forwarderId: string) => {
     setSelectedForwarder(forwarderId);
+    setIsRequestQuoteOpen(true);
   };
 
   const handleBookingSubmit = (data: FreightBookingData) => {
-    setBookingDetails(data);
-    // Here you would typically send this data to your backend and get a booking ID in response
-    setBookingIds([
-      ...bookingIds,
-      `B${bookingIds.length + 1}`.padStart(4, "0")
-    ]);
+    setBookingDetails([...bookingDetails, data]);
   };
 
-  const handleConfirmQuote = (
+  const handleConfirmQuote = async (
     bookingId: string,
     freightForwarderId: string
   ) => {
@@ -54,14 +54,31 @@ export function FindForwarder() {
       `Requesting quote for booking ${bookingId} from forwarder ${freightForwarderId}`
     );
     // Here you would send this data to your backend
-    setSelectedForwarder(null); // Reset selected forwarder after confirming
+    const data = {
+      bookingId: bookingId,
+      freightForwarderId: freightForwarderId
+    };
+    try {
+      const response = await axios.post(
+        `${baseUrl}/freight/freightQuote/requestFreightQuote`,
+        data
+      );
+      console.log(response.data);
+    } catch (err) {
+      console.log(
+        "Could not send quotation request to  freight forwarder",
+        err
+      );
+    }
+    setSelectedForwarder(null);
+    setIsRequestQuoteOpen(false); // Close the dialog after confirming
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Find Forwarder</h1>
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="md:w-2/3 space-y-4">
+        <div className="md:w-full space-y-4">
           <FreightBookingForm onSubmit={handleBookingSubmit} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {freightForwarders.map(forwarder =>
@@ -73,44 +90,61 @@ export function FindForwarder() {
             )}
           </div>
         </div>
-        <div className="md:w-1/3 space-y-4">
-          {bookingDetails &&
-            <Card>
+        <div className="md:w-1/2 space-y-4">
+          {bookingDetails.map(booking =>
+            <Card key={booking.id}>
               <CardHeader>
-                <CardTitle>Latest Booking Details</CardTitle>
+                <CardTitle>Freight Booking Details</CardTitle>
+                <span className="text-sm ">
+                  Booking Id : {booking.id}
+                </span>
               </CardHeader>
               <CardContent>
                 <p>
-                  <strong>Origin:</strong> {bookingDetails.origin}
+                  <strong>Origin:</strong> {booking.origin}
                 </p>
                 <p>
-                  <strong>Destination:</strong> {bookingDetails.destination}
+                  <strong>Destination:</strong> {booking.destination}
                 </p>
                 <p>
-                  <strong>Departure Date:</strong>{" "}
-                  {bookingDetails.departureDate}
+                  <strong>Product Name:</strong> {booking.product}
                 </p>
                 <p>
-                  <strong>Load:</strong> {bookingDetails.load}
+                  <strong>Product Unit:</strong> {booking.productUnit}
                 </p>
                 <p>
-                  <strong>Containers:</strong> {bookingDetails.noOfContainers}
+                  <strong>Expected Departure Date:</strong>{" "}
+                  {new Intl.DateTimeFormat("en-US", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  }).format(new Date(booking.departureDate))}
                 </p>
                 <p>
-                  <strong>Container Type:</strong>{" "}
-                  {bookingDetails.containerType}
+                  <strong>Load:</strong> {booking.load} {booking.loadUnit}
                 </p>
                 <p>
-                  <strong>Product Unit:</strong> {bookingDetails.productUnit}
+                  <strong>Containers:</strong> {booking.noOfContainers}
+                </p>
+                <p>
+                  <strong>Container Type:</strong> {booking.containerType}
                 </p>
               </CardContent>
-            </Card>}
-          {selectedForwarder &&
-            <RequestQuoteCard
-              bookingIds={bookingIds}
-              freightForwarderId={selectedForwarder}
-              onConfirm={handleConfirmQuote}
-            />}
+            </Card>
+          )}
+          <Dialog
+            open={isRequestQuoteOpen}
+            onOpenChange={setIsRequestQuoteOpen}
+          >
+            <DialogContent>
+              {selectedForwarder &&
+                <RequestQuoteCard
+                  bookings={bookingDetails}
+                  freightForwarderId={selectedForwarder}
+                  onConfirm={handleConfirmQuote}
+                />}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

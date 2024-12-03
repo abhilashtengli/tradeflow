@@ -36,6 +36,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Booking not found" });
     }
 
+    const duplicate = await prisma.freightQuote.findFirst({
+      where: {
+        bookingId: body.bookingId,
+        freightForwarderId: body.freightForwarderId
+      }
+    });
+    if (duplicate) {
+      return NextResponse.json({
+        message: "Already requested quote for the selected booking details"
+      });
+    }
+
     const data = await prisma.freightQuote.create({
       data: {
         freightForwarderId: body.freightForwarderId,

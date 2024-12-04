@@ -13,7 +13,7 @@ const page = async () => {
     data = response.data.data;
 
     const bookings = await axios.get(
-      `${baseUrl}/freight/freightBooking/getBookings/userBookings`
+      `${baseUrl}/freight/freightBooking/getBookings/userBookings?`
     );
     bookingDetails = bookings.data.data;
   } catch (err) {

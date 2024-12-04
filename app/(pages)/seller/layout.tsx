@@ -6,6 +6,8 @@ import { Bell, Search } from "lucide-react";
 import { UserMenu } from "./components/UseMenu";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { Toaster } from "@/components/ui/toaster";
+
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
@@ -16,8 +18,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
     console.log(err);
   }
 
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <div className="flex h-screen bg-gray-100 w-full">
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
@@ -28,15 +29,8 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
               </h2>
               <div className="flex items-center">
                 <div className="relative">
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="pl-10 pr-4 py-2 rounded-full"
-                  />
-                  <Search
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    size={20}
-                  />
+                  <Input type="search" placeholder="Search..." className="pl-10 pr-4 py-2 rounded-full" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 </div>
                 <Button variant="ghost" size="icon" className="ml-4">
                   <Bell size={20} />
@@ -46,10 +40,10 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
             </div>
           </header>
           {children}
+          <Toaster />
         </main>
       </div>
-    </SidebarProvider>
-  );
+    </SidebarProvider>;
 };
 
 export default Layout;

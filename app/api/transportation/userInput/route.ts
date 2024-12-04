@@ -17,7 +17,6 @@ const tsValidation = z.object({
   origin: z.string(),
   destination: z.string(),
   load: z.number(),
-  userId: z.string(),
   loadUnit: z.enum(["tons", "Kilograms", "Pounds"])
 });
 
@@ -25,10 +24,15 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { success } = tsValidation.safeParse(body);
+  const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //logged in user id
+  const result = tsValidation.safeParse(body);
 
-  if (!success) {
-    return NextResponse.json({ message: "Invalid Inputs" }, { status: 400 });
+  if (!result.success) {
+    return NextResponse.json({
+      message: "Invalid Inputs",
+      error: result.error.errors,
+      status: 400
+    });
   }
 
   const origin = body.origin;
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
         origin: body.origin,
         destination: body.destination,
         load: body.load,
-        userId: body.userId,
+        userId: userId,
         distance,
         price: price,
         userConfirmBooking: true,

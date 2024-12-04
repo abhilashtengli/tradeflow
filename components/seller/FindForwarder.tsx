@@ -50,9 +50,9 @@ export function FindForwarder({
     bookingId: string,
     freightForwarderId: string
   ) => {
-    console.log(
-      `Requesting quote for booking ${bookingId} from forwarder ${freightForwarderId}`
-    );
+    // console.log(
+    //   `Requesting quote for booking ${bookingId} from forwarder ${freightForwarderId}`
+    // );
     // Here you would send this data to your backend
     const data = {
       bookingId: bookingId,

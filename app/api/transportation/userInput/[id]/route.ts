@@ -97,7 +97,7 @@ export async function GET({ params }: { params: { id: string } }) {
             name: true,
             email: true,
             companyName: true,
-            companyAddres: true
+            companyAddress: true
           }
         }
       }

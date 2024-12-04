@@ -32,7 +32,7 @@ const validateInput = z.object({
   freightIsAccepted: z.boolean().optional(),
   currency: z.enum(["USD", "EURO", "GBP", "INR", "RUB", "CNY"]).optional(),
   bookingId: z.string(),
-  paymentStatus: z.enum(["PENDING", "PAID", "CANCELLED"])
+  paymentStatus: z.enum(["PENDING", "PAID", "CANCELLED"]).optional()
 });
 
 const prisma = new PrismaClient();

@@ -243,6 +243,7 @@ model FreightQuote  {
   userId               String
   price                Float?
   isAccepted           Boolean?
+  isRejected           Boolean?
   currency             Currency?
   pendingQuote        Boolean              @default(true)
 }

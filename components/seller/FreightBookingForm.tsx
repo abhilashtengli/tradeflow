@@ -139,6 +139,7 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
             <div className="space-y-2">
               <Label htmlFor="load">Load</Label>
               <Input
+                type="number"
                 id="load"
                 name="load"
                 value={formData.load}
@@ -193,10 +194,11 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="productName">Product Name</Label>
+              <Label htmlFor="product">Product Name</Label>
               <Input
-                id="productName"
-                name="productName"
+                type="text"
+                id="product"
+                name="product"
                 value={formData.product}
                 onChange={handleChange}
                 required

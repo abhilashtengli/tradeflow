@@ -127,7 +127,12 @@ export function FindForwarder({
                   <strong>Containers:</strong> {booking.noOfContainers}
                 </p>
                 <p>
-                  <strong>Container Type:</strong> {booking.containerType}
+                  <strong>Container Type: </strong>
+                  {booking.containerType === "Type_20"
+                    ? "20 ft"
+                    : booking.containerType === "Type_40"
+                      ? "40 ft"
+                      : "Unkown type"}
                 </p>
               </CardContent>
             </Card>

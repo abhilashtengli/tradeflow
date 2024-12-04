@@ -14,24 +14,41 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
 
     const { success } = await validateInput.safeParse(body);
-
-    let confirm;
-    if (body.userConfirm == "accepted") {
-      confirm = true;
-    } else {
-      confirm = false;
-    }
-
     if (!success) {
       return NextResponse.json({
         message: "Invalid inputs provided"
       });
+    }
+
+    let confirm;
+    let rejected;
+    if (body.userConfirm == "accepted") {
+      confirm = true;
+      rejected = false;
+    } else {
+      confirm = false;
+      rejected = true;
+    }
+    if (rejected === true && confirm === false) {
+      await prisma.freightQuote.update({
+        where: {
+          id: body.freightQuoteId
+        },
+        data: {
+          isAccepted: confirm,
+          isRejected: rejected
+        }
+      });
+      return NextResponse.json({
+        message : "Quote is rejected"
+      })
     }
     const freightQuote = await prisma.freightQuote.findUnique({
       where: {
         id: body.freightQuoteId
       }
     });
+
     const ffId = freightQuote?.freightForwarderId;
     if (!ffId) {
       return NextResponse.json({
@@ -39,15 +56,17 @@ export async function PATCH(request: NextRequest) {
       });
     }
 
-    await prisma.$transaction(async () => {
+    const response = await prisma.$transaction(async () => {
       await prisma.freightQuote.update({
         where: {
           id: body.freightQuoteId
         },
         data: {
-          isAccepted: confirm
+          isAccepted: confirm,
+          isRejected: rejected
         }
       });
+
       await prisma.freightBooking.update({
         where: {
           id: body.bookingId
@@ -59,7 +78,8 @@ export async function PATCH(request: NextRequest) {
       });
     });
     return NextResponse.json({
-      message: "Booking confirmed successfully"
+      data: response,
+      message: "performed operation successfully"
     });
   } catch (err) {
     return NextResponse.json({ error: err });

@@ -64,7 +64,14 @@ const indianPorts = [
   "Chennai Port, Tamil Nadu.",
   "Tuticorin Port, Tamil Nadu.",
   "Cochin Port, Kerala.",
-  "New Mangalore Port, Karnataka."
+  "New Mangalore Port, Karnataka.",
+  "Kandla Port, Gujarat",
+  "Mundra Port, Gujarat",
+  "Pipavav Port, Gujarat",
+  "Dahej Port, Gujarat",
+  "Hazira Port, Gujarat",
+  "Jawaharlal Nehru Port, Maharashtra",
+  "Mumbai Port, Maharashtra"
 ];
 const formSchema = z.object({
   type: z.enum([
@@ -80,7 +87,7 @@ const formSchema = z.object({
   origin: z.string().refine((val) => indianDistricts.includes(val), {
     message: "Please select a valid Indian district"
   }),
-  destination: z.string().refine((val) => indianDistricts.includes(val), {
+  destination: z.string().refine((val) => indianPorts.includes(val), {
     message: "Please select a valid Indian district"
   }),
   load: z.number().positive(),
@@ -103,8 +110,23 @@ export default function TransportationForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    const data = {
+      type: values.type,
+      load: values.load,
+      loadUnit: values.loadUnit,
+      origin: values.origin,
+      destination: values.destination
+    };
+    console.log(data);
+
     // Simulating API call
-    const response = await axios.post(`${baseUrl}/`)
+    const response = await axios.post(
+      `${baseUrl}/transportation/userInput`,
+      data
+    );
+
+    console.log(response.data);
+
     await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log(values);
     setIsSubmitting(false);
@@ -116,8 +138,8 @@ export default function TransportationForm() {
   }
 
   return (
-    <div className="w-full flex justify-center py-20 mt-12">
-      <Card className="w-full max-w-4xl">
+    <div className="w-full flex justify-center py-20 ">
+      <Card className="w-full max-w-4xl ">
         <CardHeader>
           <div className="flex items-center space-x-2">
             <Info className="w-5 h-5 text-muted-foreground" />
@@ -193,7 +215,7 @@ export default function TransportationForm() {
                               <SelectValue placeholder="Select origin" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className=" h-80">
                             {indianDistricts.map((district) => (
                               <SelectItem key={district} value={district}>
                                 {district}
@@ -226,10 +248,10 @@ export default function TransportationForm() {
                                   <SelectValue placeholder="Select destination" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
-                                {indianPorts.map((district) => (
-                                  <SelectItem key={district} value={district}>
-                                    {district}
+                              <SelectContent className="h-80">
+                                {indianPorts.map((ports) => (
+                                  <SelectItem key={ports} value={ports}>
+                                    {ports}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

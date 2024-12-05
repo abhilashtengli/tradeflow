@@ -15,7 +15,7 @@ const tsValidation = z.object({
       "Curtain_Side_Truck"
     ])
     .optional(),
-  load: z.number().optional(),
+  load: z.number().optional(), 
   transportationId: z.string(),
   dispatched: z.boolean().optional(),
   delivered: z.boolean().optional(),

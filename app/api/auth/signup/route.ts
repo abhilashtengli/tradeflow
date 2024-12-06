@@ -91,7 +91,9 @@ export async function POST(req: NextRequest) {
         }
       });
       if (user || userTs || userFf) {
-        return NextResponse.json({ message: "User already exists with this email address" }), { status: 400 };
+        return NextResponse.json(
+          { message: "User already exists with this email address" }
+        ), { status: 400 };
       }
       const userFfData = await prisma.freightForwarder.create({
         data: {
@@ -103,7 +105,10 @@ export async function POST(req: NextRequest) {
       });
       return NextResponse.json({ data: userFfData }, { status: 200 });
     }
-     return NextResponse.json({ message: "Invalid role specified" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Invalid role specified" },
+      { status: 400 }
+    );
   } catch (err) {
     console.error("Error creating user:", err);
     return NextResponse.json(

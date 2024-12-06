@@ -56,7 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isPasswordValid) {
           throw new Error("Invalid password");
         }
-        return { id: user.id, name: user.name, email: user.email };
+        return { id: user.id, name: user.name, email: user.email,  userRole: "user",  };
         }
 
         if (userTs) {
@@ -67,7 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (!isPasswordValid) {
           throw new Error("Invalid password");
           }
-          return { id: userTs.id, name: userTs.name, email: userTs.email };
+          return { id: userTs.id, name: userTs.name, email: userTs.email,   userRole: "transporter", };
 
         }
          if (userFf) {
@@ -78,7 +78,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (!isPasswordValid) {
           throw new Error("Invalid password");
           }
-          return { id: userFf.id, name: userFf.name, email: userFf.email };
+          return { id: userFf.id, name: userFf.name, email: userFf.email, userRole: "freightForwarder",  };
 
         }
         return null;
@@ -92,6 +92,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub ?? token.id as string;
+        session.user.userRole = token.userRole as string;
       }
       return session;
     },
@@ -99,6 +100,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.sub = user.id; 
+        token.userRole = user.userRole;
       }
       return token;
     },

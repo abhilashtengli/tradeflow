@@ -38,7 +38,7 @@ export function UserMenu({ data }: { data: User }) {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Avatar className="ml-4 cursor-pointer hover:opacity-80">
-                  <AvatarFallback>{userData.name.slice(0,2).toUpperCase() }</AvatarFallback>
+                  <AvatarFallback>  {userData?.name ? userData.name.slice(0, 2).toUpperCase() : "??"}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>

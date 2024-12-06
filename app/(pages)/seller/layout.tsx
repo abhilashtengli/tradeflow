@@ -7,18 +7,37 @@ import { UserMenu } from "./components/UseMenu";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
 import { Toaster } from "@/components/ui/toaster";
-
+import { cookies } from "next/headers"; // Import Next.js cookie handling
+import { getToken } from "next-auth/jwt";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
-    const response = await axios.get(`${baseUrl}/user/getSigninUser`);
+    const token = await getToken({
+      req: { headers: { cookie: cookies().toString() } }, // Use cookies from `next/headers`
+      secret: process.env.AUTH_SECRET,
+      cookieName: "authjs.session-token" // Adjust this if you use a different cookie name
+    });
+
+    if (!token) {
+      throw new Error("Authentication token not found or invalid.");
+    }
+
+    // Pass the decoded token in your API request
+    const response = await axios.get(`${baseUrl}/user/getSigninUser`, {
+      headers: {
+        Authorization: `Bearer ${token}` // If your API expects a bearer token
+      }
+    });
+
     data = response.data.data;
+    console.log(data);
   } catch (err) {
     console.log(err);
   }
 
-  return <SidebarProvider>
+  return (
+    <SidebarProvider>
       <div className="flex h-screen bg-gray-100 w-full">
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
@@ -29,8 +48,15 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
               </h2>
               <div className="flex items-center">
                 <div className="relative">
-                  <Input type="search" placeholder="Search..." className="pl-10 pr-4 py-2 rounded-full" />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="pl-10 pr-4 py-2 rounded-full"
+                  />
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
                 </div>
                 <Button variant="ghost" size="icon" className="ml-4">
                   <Bell size={20} />
@@ -43,7 +69,8 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
           <Toaster />
         </main>
       </div>
-    </SidebarProvider>;
+    </SidebarProvider>
+  );
 };
 
 export default Layout;

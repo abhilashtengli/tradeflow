@@ -1,96 +1,57 @@
-// export { auth as middleware } from "./lib/auth";
-
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-
-const protectedRoutes = ["/api/user"];
 
 export async function middleware(request: NextRequest) {
+  const publicPaths = [
+    "/signin",
+    "/signup",
+    "/api/auth/signup",
+    "/api/auth/signin"
+  ];
   const path = request.nextUrl.pathname;
 
-  const isPublicPath = path === "/signin" || path === "/signup";
+  // Allow public paths
+  if (publicPaths.some(publicPath => path.startsWith(publicPath))) {
+    return NextResponse.next();
+  }
 
+  // Extract token
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
-    cookieName: "authjs.session-token",
+    cookieName: "authjs.session-token" // Or whatever your cookie name is
   });
 
   if (!token) {
-    if (protectedRoutes.some((route) => path.startsWith(route))) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-  }
-  if (token) {
-    const userId = token?.userId as string;
-    if (protectedRoutes.some((route) =>request.nextUrl.pathname.startsWith(route))) {
-      if (!token && !userId) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-      }
-      const user = await prisma.user.findUnique({
-        where: {
-          id: userId
-        }
-      });
-      const userTs = await prisma.userTransporter.findUnique({
-        where: {
-          id: userId
-        }
-      });
-      const userFf = await prisma.freightForwarder.findUnique({
-        where: {
-          id: userId
-        }
-      });
-      if (!user || !userTs || !userFf) {
-        return NextResponse.json(
-          {
-            message: "User not found"
-          },
-          { status: 404 }
-        );
-      }
-      const response = NextResponse.next();
-
-      // Add user data to response headers (this will be available in the downstream API or page)
-      if (user) {
-        response.headers.set("x-user-id", user.id);
-        response.headers.set("x-user-name", user.name);
-        response.headers.set("x-user-email", user.email);
-      }
-      if (userTs) {
-        response.headers.set("x-user-id", userTs.id);
-        response.headers.set("x-user-name", userTs.name);
-        response.headers.set("x-user-email", userTs.email);
-      }
-      if (userFf) {
-        response.headers.set("x-user-id", userFf.id);
-        response.headers.set("x-user-name", userFf.name);
-        response.headers.set("x-user-email", userFf.email);
-      }
-
-      return response;
-    }
+    // Redirect to signin if no valid token is present
+    return NextResponse.redirect(new URL("/signin", request.url));
   }
 
-  // Redirect logged-in users away from /signin or /signup to /dashboard
-  if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // Check token payload for necessary claims
+  const userRole = token.userRole;
+  const userId = token.id;
+
+  if (!userRole || !userId) {
+    const redirectUrl = new URL("/signin", request.url);
+    redirectUrl.searchParams.set("error", "missingTokenData");
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // Redirect to /signin if trying to access protected route without a token
-  if (!isPublicPath && !token) {
-    if (path !== "/signin") {
-      return NextResponse.redirect(new URL("/signin", request.url));
-    }
-  }
+  // Add token data to headers for downstream processing
+  const response = NextResponse.next();
+  response.headers.set("x-user-id", userId as string);
+  response.headers.set("x-user-role", userRole as string);
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ["/dashboard", "/admin/:path*",] //"/api/user/:path*"
+  matcher: [
+    "/api/:path*",
+    "/admin/:path*",
+    "/buyer/:path*",
+    "/seller/:path*",
+    "/freightForwarder/:path*",
+    "/transporter/:path*"
+  ]
 };

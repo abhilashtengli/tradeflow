@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
-  const publicPaths = [
-    "/signin",
-    "/signup",
-    "/api/auth/signup",
-    "/api/auth/signin"
-  ];
+  const publicFrontendPaths = ["/signin", "/signup"];
+  const publicBackendPaths = ["/api/auth/"];
   const path = request.nextUrl.pathname;
 
   // Allow public paths
-  if (publicPaths.some(publicPath => path.startsWith(publicPath))) {
+  if (
+    publicFrontendPaths.some(frontendPath => path.startsWith(frontendPath)) ||
+    publicBackendPaths.some(backendPath => path.startsWith(backendPath))
+  ) {
+    console.log("Public path accessed, skipping middleware:", path);
     return NextResponse.next();
   }
 
@@ -21,6 +21,8 @@ export async function middleware(request: NextRequest) {
     secret: process.env.AUTH_SECRET,
     cookieName: "authjs.session-token" // Or whatever your cookie name is
   });
+
+  console.log("Token from middleware:", token);
 
   if (!token) {
     // Redirect to signin if no valid token is present

@@ -10,109 +10,52 @@ export async function POST(req: NextRequest) {
 
     const hashPassword = await bcrypt.hash(password, 10);
 
-    if (role === "Buyer" || role === "Seller") {
-      const user = await prisma.user.findUnique({
-        where: {
-          email: email
-        }
-      });
-      const userTs = await prisma.userTransporter.findUnique({
-        where: {
-          email: email
-        }
-      });
-      const userFf = await prisma.freightForwarder.findUnique({
-        where: {
-          email: email
-        }
-      });
-      if (user || userTs || userFf) {
+    // Check for existing user in any table
+    const existingUser =
+      (await prisma.user.findUnique({ where: { email } })) ||
+      (await prisma.userTransporter.findUnique({ where: { email } })) ||
+      (await prisma.freightForwarder.findUnique({ where: { email } }));
+
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "User already exists with this email address" },
+        { status: 400 }
+      );
+    }
+
+    let newUser;
+    switch (role) {
+      case "Buyer":
+      case "Seller":
+        newUser = await prisma.user.create({
+          data: { email, password: hashPassword, name, role }
+        });
+        break;
+      case "Transporter":
+        newUser = await prisma.userTransporter.create({
+          data: { email, password: hashPassword, name, role }
+        });
+        break;
+      case "FreightForwarder":
+        newUser = await prisma.freightForwarder.create({
+          data: { email, password: hashPassword, name, role }
+        });
+        break;
+      default:
         return NextResponse.json(
-          { message: "User already exists with this email address" },
+          { message: "Invalid role specified" },
           { status: 400 }
         );
-      }
-      const newUser = await prisma.user.create({
-        data: {
-          email,
-          password: hashPassword,
-          name,
-          role
-        }
-      });
-      return NextResponse.json({
-        message: "User created successfully",
-        user: newUser
-      });
-    } else if (role === "Transporter") {
-      const user = await prisma.userTransporter.findUnique({
-        where: {
-          email: email
-        }
-      });
-      const userTs = await prisma.userTransporter.findUnique({
-        where: {
-          email: email
-        }
-      });
-      const userFf = await prisma.freightForwarder.findUnique({
-        where: {
-          email: email
-        }
-      });
-      if (user || userTs || userFf) {
-        return NextResponse.json(
-          { message: "User already exists with this email address" }
-        ), { status: 400 };
-      }
-      const userData = await prisma.userTransporter.create({
-        data: {
-          email,
-          password: hashPassword,
-          name,
-          role
-        }
-      });
-      return NextResponse.json({ data: userData }, { status: 200 });
-    } else if (role === "FreightForwarder") {
-      const user = await prisma.userTransporter.findUnique({
-        where: {
-          email: email
-        }
-      });
-      const userTs = await prisma.userTransporter.findUnique({
-        where: {
-          email: email
-        }
-      });
-      const userFf = await prisma.freightForwarder.findUnique({
-        where: {
-          email: email
-        }
-      });
-      if (user || userTs || userFf) {
-        return NextResponse.json(
-          { message: "User already exists with this email address" }
-        ), { status: 400 };
-      }
-      const userFfData = await prisma.freightForwarder.create({
-        data: {
-          email,
-          password: hashPassword,
-          name,
-          role
-        }
-      });
-      return NextResponse.json({ data: userFfData }, { status: 200 });
     }
+
     return NextResponse.json(
-      { message: "Invalid role specified" },
-      { status: 400 }
+      { message: "User created successfully", user: newUser },
+      { status: 201 }
     );
   } catch (err) {
     console.error("Error creating user:", err);
     return NextResponse.json(
-      { message: "Error creating user " + err },
+      { message: `Error creating user: ${err}` },
       { status: 500 }
     );
   }

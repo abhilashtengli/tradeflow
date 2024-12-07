@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 //GetUser
-export async function GET() {
-  const id = "5abd8eff-fb43-47d9-9a61-69291f3e5b42"; //change it the end
+export async function GET(req: NextRequest) {
+  const id = (await req.headers.get("x-user-id")) as string;
 
   try {
     const user = await prisma.user.findUnique({

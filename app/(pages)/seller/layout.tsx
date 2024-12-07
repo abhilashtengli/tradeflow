@@ -8,32 +8,32 @@ import axios from "axios";
 import { baseUrl } from "@/app/config";
 import { Toaster } from "@/components/ui/toaster";
 import { cookies } from "next/headers"; // Import Next.js cookie handling
-import { getToken } from "next-auth/jwt";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
-    const token = await getToken({
-      req: { headers: { cookie: cookies().toString() } }, // Use cookies from `next/headers`
-      secret: process.env.AUTH_SECRET,
-      cookieName: "authjs.session-token" // Adjust this if you use a different cookie name
-    });
+    const cookieStore = await cookies();
+    const tokenCookie = cookieStore.get("authjs.session-token")?.value;
+    console.log(tokenCookie);
+    
 
-    if (!token) {
-      throw new Error("Authentication token not found or invalid.");
+    if (!tokenCookie) {
+      console.log("Authentication token not found.");
+      throw new Error("Authentication token not found.");
     }
 
-    // Pass the decoded token in your API request
+    // Pass the token directly in your API request
     const response = await axios.get(`${baseUrl}/user/getSigninUser`, {
       headers: {
-        Authorization: `Bearer ${token}` // If your API expects a bearer token
-      }
+        Authorization: `Bearer ${tokenCookie}`, // Use the raw token from cookies
+      },
     });
 
     data = response.data.data;
     console.log(data);
+    
   } catch (err) {
-    console.log(err);
+    console.error("Error fetching user data:", err);
   }
 
   return (

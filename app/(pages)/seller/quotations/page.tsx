@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
-
+import { getAuthTokenFromCookie } from "@/lib/authClientHelper";
 
 type Product = {
   id: string;
@@ -45,7 +45,7 @@ type Product = {
   unit: string;
   productOrigin: string;
   isAvailable: boolean;
-  currency : string
+  currency: string;
 };
 
 type Quote = {
@@ -65,7 +65,13 @@ type Quote = {
   createdAt: string;
 };
 
-export default function QuotationSection() {
+export default  function QuotationSection() {
+  const token = getAuthTokenFromCookie();
+  console.log(token);
+  
+  if (!token) {
+    console.log("Authentication token not found.");
+  }
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [currentQuote, setCurrentQuote] = React.useState<Quote | null>();
   const [newQuote, setNewQuote] = React.useState({
@@ -78,12 +84,13 @@ export default function QuotationSection() {
   });
   const [requestedQuotes, setRequestedQuotes] = useState<Quote[]>([]);
   const [sentQuotes, setSentQuotes] = useState<Quote[]>([]);
-
   useEffect(() => {
     const fetchRequestedQuotes = async () => {
       try {
         const response = await axios.get<{ data: Quote[] }>(
-          `${baseUrl}/product/productQuote/sellerQuote`
+          `${baseUrl}/product/productQuote/sellerQuote`,
+          {withCredentials : true}
+          
         );
         // console.log(response.data.data);
 
@@ -95,7 +102,8 @@ export default function QuotationSection() {
     const fetchSentquotes = async () => {
       try {
         const response = await axios.get(
-          `${baseUrl}/product/productQuote/sellerQuote/getSentQuotes`
+          `${baseUrl}/product/productQuote/sellerQuote/getSentQuotes`,
+          {withCredentials : true}
         );
         console.log(response.data.data);
 
@@ -167,12 +175,12 @@ export default function QuotationSection() {
               <Card key={quote.product?.id}>
                 <CardHeader className="grid grid-cols-2">
                   <div>
-                  <CardTitle>{quote.product?.name}</CardTitle>{" "}
-                  {/* Accessing the product name */}
-                  <CardDescription>
-                    Requested by{" "}
-                    {quote.Buyer?.name?.toUpperCase() || "Unknown Buyer"}
-                  </CardDescription>{" "}
+                    <CardTitle>{quote.product?.name}</CardTitle>{" "}
+                    {/* Accessing the product name */}
+                    <CardDescription>
+                      Requested by{" "}
+                      {quote.Buyer?.name?.toUpperCase() || "Unknown Buyer"}
+                    </CardDescription>{" "}
                     {/* Using buyerId or default */}
                   </div>
                   <div className="text-[12px]  text-end">
@@ -222,8 +230,10 @@ export default function QuotationSection() {
                   </div>
                 </CardHeader>
                 <CardContent className="text-zinc-800">
-                  <p>Price quotated : {quote.price} {quote.currency }</p>
-                  <p>Category : {quote.product?.category }</p>
+                  <p>
+                    Price quotated : {quote.price} {quote.currency}
+                  </p>
+                  <p>Category : {quote.product?.category}</p>
                   {quote.portOfOrigin && (
                     <p>Port of Origin : {quote.portOfOrigin}</p>
                   )}

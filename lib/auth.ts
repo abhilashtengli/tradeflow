@@ -23,14 +23,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           type: "password"
         }
       },
-      authorize: async credentials => {
-        const { email, password } = credentials;  
-        
+      authorize: async (credentials) => {
+        const { email, password } = credentials;
+
         const userTs = await prisma.userTransporter.findUnique({
           where: {
             email: email as string
           }
-        })
+        });
         const user = await prisma.user.findUnique({
           where: {
             email: email as string
@@ -41,22 +41,25 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           where: {
             email: email as string
           }
-        })
-        
+        });
+
         if (!user && !userTs && !userFf) {
           throw new CredentialsSignin("user is in valid");
-          
         }
-
         if (user) {
           const isPasswordValid = await bcrypt.compare(
-          password as string,
-          user.password
-        );
-        if (!isPasswordValid) {
-          throw new Error("Invalid password");
-        }
-        return { id: user.id, name: user.name, email: user.email,  userRole: "user",  };
+            password as string,
+            user.password
+          );
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
+          }
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            userRole: "user"
+          };
         }
 
         if (userTs) {
@@ -64,46 +67,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             password as string,
             userTs.password
           );
-            if (!isPasswordValid) {
-          throw new Error("Invalid password");
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
           }
-          return { id: userTs.id, name: userTs.name, email: userTs.email,   userRole: "transporter", };
-
+          return {
+            id: userTs.id,
+            name: userTs.name,
+            email: userTs.email,
+            userRole: "transporter"
+          };
         }
-         if (userFf) {
+        if (userFf) {
           const isPasswordValid = await bcrypt.compare(
             password as string,
             userFf.password
           );
-            if (!isPasswordValid) {
-          throw new Error("Invalid password");
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
           }
-          return { id: userFf.id, name: userFf.name, email: userFf.email, userRole: "freightForwarder",  };
-
+          return {
+            id: userFf.id,
+            name: userFf.name,
+            email: userFf.email,
+            userRole: "freightForwarder"
+          };
         }
         return null;
       }
     })
   ],
-   session: {
-    strategy: "jwt",
+  session: {
+    strategy: "jwt"
   },
   callbacks: {
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.sub ?? token.id as string;
-        session.user.userRole = token.userRole as string;
-      }
-      return session;
-    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.sub = user.id; 
+        token.sub = user.id;
         token.userRole = user.userRole;
+       
+        // token.accessToken = user.accessToken;
       }
       return token;
     },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.sub ?? (token.id as string);
+        session.user.userRole = token.userRole as string;
+      }
+      return session;
+    }
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET
 });

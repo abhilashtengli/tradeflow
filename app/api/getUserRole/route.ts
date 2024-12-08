@@ -30,5 +30,5 @@ export async function POST(request: NextRequest) {
       role: true
     }
   });
-  if(userFf) return NextResponse.json({ role: userFf.role || null });
+  if (userFf) return NextResponse.json({ role: userFf.role || null });
 }

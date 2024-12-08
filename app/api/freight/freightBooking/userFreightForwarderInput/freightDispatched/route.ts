@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -13,9 +14,13 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { success } = validateInput.safeParse(body);
+    const result = validateInput.safeParse(body);
 
-    if (!success) return NextResponse.json({ message: " Invalid inputs" });
+    if (!result.success)
+      return NextResponse.json({
+        message: " Invalid inputs",
+        error: result.error.errors
+      });
 
     const dispatchedData = await prisma.freightBooking.update({
       where: {

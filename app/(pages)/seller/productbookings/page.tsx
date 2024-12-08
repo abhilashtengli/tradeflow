@@ -100,6 +100,7 @@ export default function ProductBookingDashboard() {
           `${baseUrl}/product/productBooking/sellerBookingInput`
         );
         setBookings(response.data.data);
+        // console.log(response.data.data);
       } catch (err) {
         console.error(err);
       } finally {

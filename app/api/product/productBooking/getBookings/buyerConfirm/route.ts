@@ -1,17 +1,18 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 // Get product by dynamic key-value
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     console.log("reached here bk");
+    const buyerId = (await request.headers.get("x-user-id")) as string;
 
     // Fetch products based on dynamic key-value
     const productBookings = await prisma.productBooking.findMany({
       where: {
-        buyerId: "5abd8eff-fb43-47d9-9a61-69291f3e5b42",
+        buyerId: buyerId,
         buyerConfirm: true,
         bookingConfirm: false,
         isDelivered: false,

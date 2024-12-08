@@ -7,11 +7,13 @@ const prisma = new PrismaClient();
 export async function GET(request: NextRequest) {
   try {
     // const sellerId = (await request.headers.get("x-user-id")) as string;
+    const buyerId = (await request.headers.get("x-user-id")) as string;
+
     // console.log("reached be");
 
     const QuoteData = await prisma.productQuote.findMany({
       where: {
-        buyerId: "5abd8eff-fb43-47d9-9a61-69291f3e5b42",
+        buyerId: buyerId,
         pendingQuotes: false,
         buyerBookingConfirmed: false
       },

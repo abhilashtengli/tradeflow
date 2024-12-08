@@ -40,8 +40,8 @@ export async function PATCH(request: NextRequest) {
         }
       });
       return NextResponse.json({
-        message : "Quote is rejected"
-      })
+        message: "Quote is rejected"
+      });
     }
     const freightQuote = await prisma.freightQuote.findUnique({
       where: {

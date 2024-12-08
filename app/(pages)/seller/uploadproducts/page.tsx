@@ -91,6 +91,7 @@ export default function ProductForm() {
     }; // Fallback to 0 if invalid input // Fallback to 0 if invalid input
 
     try {
+      // const api = await createAuthorizedAxios();
       const response = await axios.post(`${baseUrl}/product`, productData);
       console.log(response);
     } catch (err) {

@@ -8,7 +8,9 @@ const validateId = z.object({
 });
 export async function DELETE(request: NextRequest) {
   // here add logged in user id
-  const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+  // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+      const userId = (await request.headers.get("x-user-id")) as string;
+
   try {
       const body = await request.json();
       console.log(body);

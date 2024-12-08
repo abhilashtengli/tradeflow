@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
     publicFrontendPaths.some(frontendPath => path.startsWith(frontendPath)) ||
     publicBackendPaths.some(backendPath => path.startsWith(backendPath))
   ) {
-    console.log("Public path accessed, skipping middleware:", path);
+    // console.log("Public path accessed, skipping middleware:", path);
     return NextResponse.next();
   }
 

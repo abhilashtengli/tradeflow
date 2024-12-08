@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // const buyerId = request.headers.get("x-user-id") as string;
-    const buyerId = "5abd8eff-fb43-47d9-9a61-69291f3e5b42";
+    const buyerId = (await request.headers.get("x-user-id")) as string;
 
     const body = await request.json();
     console.log(body);

@@ -8,7 +8,8 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
 
   // const userId = request.headers.get("x-user-id") as string;
-  const userId = "30f0e50e-99da-456c-b873-b19565c451b0";
+  // const userId = "30f0e50e-99da-456c-b873-b19565c451b0";
+  const userId = (await request.headers.get("x-user-id")) as string;
 
   const result = updateUserTs.safeParse(body);
 

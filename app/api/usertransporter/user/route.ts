@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   // const userId = request.headers.get("x-user-id") as string;
 
   try {
-    const id = "30f0e50e-99da-456c-b873-b19565c451b0";
+    const id = (await request.headers.get("x-user-id")) as string;
 
     const user = await prisma.userTransporter.findUnique({
       where: {

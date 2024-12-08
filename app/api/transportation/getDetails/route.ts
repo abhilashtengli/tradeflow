@@ -1,11 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 // Get All the transportation clients
-export async function GET() {
-  const userId = "30f0e50e-99da-456c-b873-b19565c451b0";
+export async function GET(request: NextRequest) {
+  // const userId = "30f0e50e-99da-456c-b873-b19565c451b0";
+  const userId = (await request.headers.get("x-user-id")) as string;
   try {
     const acceptedData = await prisma.transportation.findMany({
       where: {

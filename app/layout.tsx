@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,9 +17,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Trade Flow",
   description: "Trade flow is a web app which helps importers and exporters.",
-  icons: [
-    { rel: "icon", url: "/trade_icon.png" }
-  ]
+  icons: [{ rel: "icon", url: "/trade_icon.png" }]
 
   // icons: {
   //   icon: [
@@ -39,9 +38,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <SessionProvider> {children} </SessionProvider>
       </body>
     </html>
   );
 }
-

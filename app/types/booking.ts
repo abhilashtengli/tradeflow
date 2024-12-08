@@ -26,3 +26,4 @@ export interface Booking {
   transporterId?: string;
   userId: string;
 }
+ 

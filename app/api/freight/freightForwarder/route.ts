@@ -47,9 +47,10 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
+    // const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
+    const userId = (await request.headers.get("x-user-id")) as string;
 
     const response = await prisma.freightForwarder.findUnique({
       where: {

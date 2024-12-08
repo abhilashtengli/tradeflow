@@ -9,7 +9,8 @@ export async function POST(request: NextRequest) {
   console.log("reached be");
 
   try {
-    const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+    // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+    const userId = (await request.headers.get("x-user-id")) as string;
     const body = await request.json();
     console.log(body);
 

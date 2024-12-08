@@ -73,10 +73,11 @@ export async function PATCH(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // const userId = request.headers.get("x-user-id") as string;
+    const sellerId = (await request.headers.get("x-user-id")) as string;
 
     const data = await prisma.productBooking.findMany({
       where: {
-        sellerId: "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"
+        sellerId: sellerId
       },
       include: {
         buyer: {

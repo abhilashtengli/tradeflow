@@ -147,7 +147,8 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   console.log("Request Body:", body);
 
-  const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //logged in user id
+  // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //logged in user id
+  const userId = (await request.headers.get("x-user-id")) as string;
   const result = tsUpdateValidation.safeParse(body);
 
   if (!result.success) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { baseUrl } from "@/app/config";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 import axios from "axios";
 import Image from "next/image";
 import { useState } from "react";
@@ -13,7 +14,7 @@ interface Data {
   country: string;
 }
 
-export default function ClientComponent({ data }: { data: Data }) {
+export default  function ClientComponent({ data }: { data: Data }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -23,6 +24,7 @@ export default function ClientComponent({ data }: { data: Data }) {
     country: undefined,
     password: undefined
   });
+  // const api = await createAuthorizedAxios();
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
     setError("");
@@ -31,7 +33,7 @@ export default function ClientComponent({ data }: { data: Data }) {
     // Handle form submission
     const updatedData = { ...formData };
     console.log(updatedData);
-    
+
     try {
       const response = await axios.patch(`${baseUrl}/user`, updatedData);
       console.log(response.data);

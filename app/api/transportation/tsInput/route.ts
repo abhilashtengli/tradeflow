@@ -28,8 +28,8 @@ const tsValidation = z.object({
 const prisma = new PrismaClient();
 
 export async function PATCH(request: NextRequest) {
-  // const tsId = request.headers.get("x-user-id") as string;
-  const tsId = "30f0e50e-99da-456c-b873-b19565c451b0";
+  // const tsId = "30f0e50e-99da-456c-b873-b19565c451b0";
+  const tsId = (await request.headers.get("x-user-id")) as string;
 
   const body = await request.json();
   console.log(body);

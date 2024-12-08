@@ -4,34 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Search } from "lucide-react";
 import { UserMenu } from "./components/UseMenu";
-import axios from "axios";
+// import axios from "axios";
 import { baseUrl } from "@/app/config";
 import { Toaster } from "@/components/ui/toaster";
-import { cookies } from "next/headers"; // Import Next.js cookie handling
+import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
-    const cookieStore = await cookies();
-    const tokenCookie = cookieStore.get("authjs.session-token")?.value;
-    console.log(tokenCookie);
-    
+    const api = await createAuthorizedAxios();
+    const response = await api.get(`${baseUrl}/user/getSigninUser`);
 
-    if (!tokenCookie) {
-      console.log("Authentication token not found.");
-      throw new Error("Authentication token not found.");
-    }
-
-    // Pass the token directly in your API request
-    const response = await axios.get(`${baseUrl}/user/getSigninUser`, {
-      headers: {
-        Authorization: `Bearer ${tokenCookie}`, // Use the raw token from cookies
-      },
-    });
-
-    data = response.data.data;
+    data = response.data?.data;
     console.log(data);
-    
   } catch (err) {
     console.error("Error fetching user data:", err);
   }
@@ -65,7 +50,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           </header>
-          {children}
+           {children} 
           <Toaster />
         </main>
       </div>

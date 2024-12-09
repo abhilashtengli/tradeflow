@@ -19,10 +19,10 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
-    cookieName: "authjs.session-token" // Or whatever your cookie name is
+    cookieName: "next-auth.session-token" // Or whatever your cookie name is
   });
 
-  console.log("Token from middleware:", token);
+  // console.log("Token from middleware:", token);
 
   if (!token) {
     // Redirect to signin if no valid token is present
@@ -41,19 +41,14 @@ export async function middleware(request: NextRequest) {
 
   // Add token data to headers for downstream processing
   const response = NextResponse.next();
-  response.headers.set("x-user-id", userId as string);
-  response.headers.set("x-user-role", userRole as string);
+  // response.headers.set("x-user-id", userId as string);
+  // response.headers.set("x-user-role", userRole as string);
 
   return response;
 }
 
 export const config = {
   matcher: [
-    "/api/:path*",
-    "/admin/:path*",
-    "/buyer/:path*",
-    "/seller/:path*",
-    "/freightForwarder/:path*",
-    "/transporter/:path*"
+    "/((?!(?:api|_next|favicon.ico|static|public)).*)" // Excludes `api`, `_next`, `favicon.ico`, `static`, and `public` directories
   ]
 };

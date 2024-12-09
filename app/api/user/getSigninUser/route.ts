@@ -1,11 +1,29 @@
+// import { getAuthToken } from "@/lib/getToken";
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+// import { cookies } from "next/headers";
+
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 //GetUser
-export async function GET(req: NextRequest) {
-  const id = (await req.headers.get("x-user-id")) as string;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET() {
+  // const id = (await req.headers.get("x-user-id")) as string;
+  // const cookieStore = await cookies();
+  // const allCookies = [...cookieStore.entries()]; // Get all cookies
+  // console.log("All cookies:", allCookies);
+  const id = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+  const session = await getServerSession(authOptions);
+
+  console.log("Session", session);
+  // con
+
+  console.log(
+    "Reached---------------------------------------------------------------------------------------"
+  );
 
   try {
     const user = await prisma.user.findUnique({

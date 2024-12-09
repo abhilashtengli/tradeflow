@@ -32,7 +32,8 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
-import { getAuthTokenFromCookie } from "@/lib/authClientHelper";
+import { useSession } from "next-auth/react";
+// import { getAuthTokenFromCookie } from "@/lib/authClientHelper";
 
 type Product = {
   id: string;
@@ -66,12 +67,12 @@ type Quote = {
 };
 
 export default  function QuotationSection() {
-  const token = getAuthTokenFromCookie();
-  console.log(token);
+  // const token = getAuthTokenFromCookie();
+  // console.log(token);
   
-  if (!token) {
-    console.log("Authentication token not found.");
-  }
+  // if (!token) {
+  //   console.log("Authentication token not found.");
+  // }
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [currentQuote, setCurrentQuote] = React.useState<Quote | null>();
   const [newQuote, setNewQuote] = React.useState({
@@ -84,13 +85,15 @@ export default  function QuotationSection() {
   });
   const [requestedQuotes, setRequestedQuotes] = useState<Quote[]>([]);
   const [sentQuotes, setSentQuotes] = useState<Quote[]>([]);
+  const { data: session } = useSession();
+  console.log(session);
+  
   useEffect(() => {
     const fetchRequestedQuotes = async () => {
       try {
         const response = await axios.get<{ data: Quote[] }>(
           `${baseUrl}/product/productQuote/sellerQuote`,
-          {withCredentials : true}
-          
+ 
         );
         // console.log(response.data.data);
 
@@ -103,7 +106,7 @@ export default  function QuotationSection() {
       try {
         const response = await axios.get(
           `${baseUrl}/product/productQuote/sellerQuote/getSentQuotes`,
-          {withCredentials : true}
+         
         );
         console.log(response.data.data);
 

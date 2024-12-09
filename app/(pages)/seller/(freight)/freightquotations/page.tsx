@@ -2,15 +2,16 @@ import { baseUrl } from "@/app/config";
 // import axios from "axios";
 import React from "react";
 import QuotationsSection from "./QuoteSection/page";
-import { createAuthorizedAxios } from "@/lib/authHelper";
+import axios from "axios";
+// import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const page = async () => {
   let requestedQuote = [];
   let receivedQuote = [];
-   const api = await createAuthorizedAxios();
+  //  const api = await createAuthorizedAxios();
   try {
     try {
-      const requested = await api.get(
+      const requested = await axios.get(
         `${baseUrl}/freight/freightQuote/user/getRequestedQuote`
       );
       requestedQuote = requested.data?.data;
@@ -18,7 +19,7 @@ const page = async () => {
       console.log("Could not fetch requested quote", err);
     }
     try {
-      const received = await api.get(
+      const received = await axios.get(
         `${baseUrl}/freight/freightQuote/user/getReceivedQuote`
       );
        receivedQuote = received.data?.data;

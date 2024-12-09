@@ -9,7 +9,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",  // Ensure Node.js module resolution strategy
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -22,11 +22,18 @@
     "paths": {
       "@/*": ["./*"],
       "@components/*": ["components/*"],
-      "@types/*" : ["types/*"],
+      "@types/*": ["types/*"]  // Correct path for custom types
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/api/freight/freightForwarder/getAll", "types/types.d.ts"],
-  "exclude": ["node_modules"],
-  "moduleResolution": "node", // Ensure modules are resolved in a Node.js-compatible way
-
+  "include": [
+    "next-env.d.ts", 
+    "**/*.ts", 
+    "**/*.tsx", 
+    ".next/types/**/*.ts", 
+    "app/api/freight/freightForwarder/getAll", 
+    "types/types.d.ts"  // Include the correct path for custom types
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -4,19 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Search } from "lucide-react";
 import { UserMenu } from "./components/UseMenu";
-// import axios from "axios";
 import { baseUrl } from "@/app/config";
 import { Toaster } from "@/components/ui/toaster";
+// import axios from "axios";
 import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
     const api = await createAuthorizedAxios();
-    const response = await api.get(`${baseUrl}/user/getSigninUser`);
-
+    const response = await api.get(`${baseUrl}/user/getSigninUser`,  { withCredentials: true });
     data = response.data?.data;
-    console.log(data);
+    // console.log(data);
   } catch (err) {
     console.error("Error fetching user data:", err);
   }

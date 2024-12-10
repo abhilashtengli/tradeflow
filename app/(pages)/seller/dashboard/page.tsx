@@ -16,8 +16,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+// import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
 
-export default function Dashboard() {
+export default async function Dashboard() {
   // Mock data for products
   const products = [
     {
@@ -63,6 +66,8 @@ export default function Dashboard() {
       image: "/placeholder.svg"
     }
   ];
+  const session = await getServerSession(authOptions);
+  console.log("SSSS", session);
 
   return (
     <div className="">

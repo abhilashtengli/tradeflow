@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
-    const sellerId = (await request.headers.get("x-user-id")) as string;
+    // const sellerId = (await request.headers.get("x-user-id")) as string;
+    const sellerId = "627826c7-0e32-4a01-ac93-0f4cbd05e169";
     // console.log("reached be");
 
     const QuoteData = await prisma.productQuote.findMany({

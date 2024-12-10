@@ -10,12 +10,18 @@ const page = async () => {
   try {
     // const api = await createAuthorizedAxios();
     const response = await axios.get(
-      `${baseUrl}/freight/freightForwarder/getAll`
+      `${baseUrl}/freight/freightForwarder/getAll`,
+      {
+        withCredentials: true
+      }
     );
     data = response.data.data;
 
     const bookings = await axios.get(
-      `${baseUrl}/freight/freightBooking/getBookings/userBookings?`
+      `${baseUrl}/freight/freightBooking/getBookings/userBookings?`,
+      {
+        withCredentials: true
+      }
     );
     bookingDetails = bookings.data.data;
   } catch (err) {

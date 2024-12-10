@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -81,7 +83,13 @@ export async function GET(request: NextRequest) {
   try {
     // const sellerId = (await request.headers.get("x-user-id")) as string;
 
-    const sellerId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+    const session = await getServerSession(authOptions);
+    console.log("Quote ", session);
+
+    // console.log("Quote header", request.headers);
+
+    // const sellerId = "627826c7-0e32-4a01-ac93-0f4cbd05e169";
+    const sellerId = session?.user.id;
 
     const QuoteData = await prisma.productQuote.findMany({
       where: {

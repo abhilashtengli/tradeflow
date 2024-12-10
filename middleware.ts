@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   // Extract token
   const token = await getToken({
     req: request,
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     cookieName: "next-auth.session-token" // Or whatever your cookie name is
   });
 
@@ -49,6 +49,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!(?:api|_next|favicon.ico|static|public)).*)" // Excludes `api`, `_next`, `favicon.ico`, `static`, and `public` directories
+    // "/((?!(?:api|_next|favicon.ico|static|public)).*)" // Excludes `api`, `_next`, `favicon.ico`, `static`, and `public` directories
+    "/((?!(?:/_next|favicon.ico|static|public)).*)"
   ]
 };

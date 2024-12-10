@@ -1,3 +1,4 @@
+
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/components/seller/sidebarComponent";
 import { Button } from "@/components/ui/button";
@@ -7,13 +8,18 @@ import { UserMenu } from "./components/UseMenu";
 import { baseUrl } from "@/app/config";
 import { Toaster } from "@/components/ui/toaster";
 // import axios from "axios";
+// import axios from "axios";
 import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
     const api = await createAuthorizedAxios();
-    const response = await api.get(`${baseUrl}/user/getSigninUser`,  { withCredentials: true });
+    const response = await api.get(`${baseUrl}/user/getSigninUser`);
+    // const response = await axios.get(
+    //   `http://localhost:3000/apis/user/getSigninUser`,
+    //   { withCredentials: true }
+    // );
     data = response.data?.data;
     // console.log(data);
   } catch (err) {
@@ -49,7 +55,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
               </div>
             </div>
           </header>
-           {children} 
+         {children} 
           <Toaster />
         </main>
       </div>

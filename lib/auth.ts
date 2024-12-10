@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth";
+import { JWT, NextAuthOptions } from "next-auth";
 // import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
@@ -85,13 +85,8 @@ export const authOptions: NextAuthOptions = {
       }
     })
   ],
-  session: {
-    strategy: "jwt" // This is correct, but needs to be typed correctly
-  },
-  jwt: {
-    secret: process.env.AUTH_SECRET, // Ensure you have this secret in your environment variables
-    maxAge: 30 * 24 * 60 * 60 // Set your JWT expiration time (30 days in this case)
-  },
+  session: { strategy: "jwt" },
+  jwt: { secret: process.env.NEXTAUTH_SECRET, maxAge: 30 * 24 * 60 * 60 },
   cookies: {
     sessionToken: {
       name: "next-auth.session-token",
@@ -99,12 +94,13 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "development" // Make sure cookies are set securely in production
+        secure: process.env.NODE_ENV === "production"
       }
     }
   },
   callbacks: {
     async jwt({ token, user }) {
+      // This is correct, but needs to be typed correctly // Ensure you have this secret in your environment variables // Set your JWT expiration time (30 days in this case) // Make sure cookies are set securely in production
       if (user) {
         token.id = user.id;
         token.sub = user.id;
@@ -114,16 +110,21 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       console.log("Session callback triggered");
-      if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.userRole = token.userRole as string;
+
+      if (token) {
+        session.user = {
+          id: token.id as string,
+          name: session.user.name,
+          email: session.user.email,
+          userRole: token.userRole as string
+        }; // Preserve name if available // Preserve email if available
       }
-      console.log("Processed session:", session);
+      session.accessToken = (token as unknown) as JWT;
 
       return session;
     }
   },
-  secret: process.env.AUTH_SECRET
+  secret: process.env.NEXTAUTH_SECRET
 };
 
 export default authOptions;

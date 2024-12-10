@@ -1,7 +1,7 @@
 // import { getAuthToken } from "@/lib/getToken";
 import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 // import { cookies } from "next/headers";
 
 import { NextResponse } from "next/server";
@@ -15,7 +15,7 @@ export async function GET() {
   // const cookieStore = await cookies();
   // const allCookies = [...cookieStore.entries()]; // Get all cookies
   // console.log("All cookies:", allCookies);
-  const id = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+  const id = "627826c7-0e32-4a01-ac93-0f4cbd05e169";
   const session = await getServerSession(authOptions);
 
   console.log("Session", session);

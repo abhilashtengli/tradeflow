@@ -42,7 +42,12 @@ export default function ClientComponent({ data }: { data: Data }) {
     try {
       const response = await axios.patch(
         `${baseUrl}/freight/freightForwarder`,
-        submissionData
+        submissionData,
+         {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
       );
       console.log(response.data);
       setFormData({ ...formData, password: "" });

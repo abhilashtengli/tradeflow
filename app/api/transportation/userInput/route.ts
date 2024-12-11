@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import axios from "axios";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
 
 const tsValidation = z.object({
   type: z.enum([
@@ -36,7 +38,7 @@ const tsUpdateValidation = z.object({
   destination: z.string().optional(),
   load: z.number().optional(),
   loadUnit: z.enum(["tons", "Kilograms", "Pounds"]).optional(),
-  bookingId : z.string()
+  bookingId: z.string()
 });
 const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -46,7 +48,15 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   console.log("Request Body:", body);
 
-  const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //logged in user id
+  // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //logged in user id
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({
+      message: "Please login!"
+    });
+  }
+
+  const userId = session.user.id;
   const result = tsValidation.safeParse(body);
 
   if (!result.success) {
@@ -126,9 +136,19 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id") as string;
+    // const userId = request.headers.get("x-user-id") as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({
+        message: "Please login!"
+      });
+    }
+    const userId = await session.user.id;
 
     const transportationData = await prisma.transportation.findMany({
       where: {
@@ -148,7 +168,15 @@ export async function PATCH(request: NextRequest) {
   console.log("Request Body:", body);
 
   // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a"; //logged in user id
-  const userId = (await request.headers.get("x-user-id")) as string;
+  // const userId = (await request.headers.get("x-user-id")) as string;
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({
+      message: "Please login!"
+    });
+  }
+  const userId = session.user.id;
   const result = tsUpdateValidation.safeParse(body);
 
   if (!result.success) {
@@ -163,12 +191,12 @@ export async function PATCH(request: NextRequest) {
     where: {
       id: body.bookingId
     }
-  })
-  
+  });
+
   if (!user || user.userId !== userId) {
     return NextResponse.json({
-      message : "Invalid request"
-    })
+      message: "Invalid request"
+    });
   }
 
   const origin = body.origin;

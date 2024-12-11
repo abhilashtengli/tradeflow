@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserTs } from "./userTsValidation/route";
 import { PrismaClient } from "@prisma/client";
+import authOptions from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +11,14 @@ export async function PATCH(request: NextRequest) {
 
   // const userId = request.headers.get("x-user-id") as string;
   // const userId = "30f0e50e-99da-456c-b873-b19565c451b0";
-  const userId = (await request.headers.get("x-user-id")) as string;
+  // const userId = (await request.headers.get("x-user-id")) as string;
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ message: "Please login!" });
+  }
+
+  const userId = session.user.id;
 
   const result = updateUserTs.safeParse(body);
 

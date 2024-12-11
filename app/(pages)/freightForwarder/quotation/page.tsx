@@ -1,21 +1,21 @@
-import { RequestedQuotes } from "@components/freightforwarder/requestedQuotes";
 import { SentQuotes } from "@components/freightforwarder/sentQuotes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { RequestedQuotesComponent } from "@/components/freightforwarder/requestedQuoteComponent";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const page = async () => {
-  // Remove this line
   // const [activeTab, setActiveTab] = useState(0)
   let requestedQuotes = [];
   let sentQuotes = [];
   try {
-    const requestedQuotesResponse = await axios.get(
+    const api = await createAuthorizedAxios();
+    const requestedQuotesResponse = await api.get(
       `${baseUrl}/freight/freightQuote`
     );
     requestedQuotes = requestedQuotesResponse.data.data;
 
-    const sentQuotesResponse = await axios.get(
+    const sentQuotesResponse = await api.get(
       `${baseUrl}/freight/freightQuote/sentQuotes`
     );
     sentQuotes = sentQuotesResponse.data.data;
@@ -34,7 +34,7 @@ const page = async () => {
           <TabsTrigger value="sent">Sent Quotes</TabsTrigger>
         </TabsList>
         <TabsContent value="requested">
-          <RequestedQuotes requestedQuotes={requestedQuotes} />
+          <RequestedQuotesComponent requestedQuotes={requestedQuotes} />
         </TabsContent>
         <TabsContent value="sent">
           <SentQuotes sentQuotes={sentQuotes} />

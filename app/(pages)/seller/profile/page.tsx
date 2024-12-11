@@ -1,7 +1,7 @@
 import { baseUrl } from "@/app/config";
 import axios from "axios";
-import ClientComponent from "./ClientComponent/page";
 import { createAuthorizedAxios } from "@/lib/authHelper";
+import ComponentOfClient from "./ComponentOfClient/page";
 
 export default async function page() {
   const api = await createAuthorizedAxios();
@@ -10,7 +10,7 @@ export default async function page() {
 
   return (
     <div>
-      <ClientComponent data={data} />
+      <ComponentOfClient data={data} />
     </div>
   );
 }

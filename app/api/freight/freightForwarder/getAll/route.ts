@@ -6,9 +6,11 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 export async function GET() {
-  console.log("reached ff url");
   const session = await getServerSession(authOptions);
-  console.log("ffffff-------------", session);
+
+  if (!session) {
+    return NextResponse.json({ message: "Please login!" });
+  }
 
   try {
     const response = await prisma.freightForwarder.findMany({

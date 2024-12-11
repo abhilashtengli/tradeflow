@@ -1,5 +1,6 @@
 import { baseUrl } from "@/app/config";
 import { BookingManagement } from "@/components/seller/Bookings/booking-management";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 import axios from "axios";
 import React from "react";
 
@@ -7,7 +8,8 @@ const page = async () => {
   let freightBookingData = [];
 
   try {
-    const response = await axios.get(
+    const api = await createAuthorizedAxios();
+    const response = await api.get(
       `${baseUrl}/freight/freightBooking/getBookings/freightAcceptedBooking`
     );
     freightBookingData = response.data?.data;

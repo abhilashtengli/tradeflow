@@ -81,12 +81,7 @@ export async function PATCH(request: NextRequest) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
-    // const sellerId = (await request.headers.get("x-user-id")) as string;
-
     const session = await getServerSession(authOptions);
-    console.log("Quote ", session);
-
-    // console.log("Quote header", request.headers);
 
     // const sellerId = "627826c7-0e32-4a01-ac93-0f4cbd05e169";
     const sellerId = session?.user.id;

@@ -6,10 +6,12 @@ import { Bell } from "lucide-react";
 import { UserMenu } from "./components/UseMenu";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 const layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
-    const response = await axios.get(`${baseUrl}/freight/freightForwarder`);
+    const api = await createAuthorizedAxios();
+    const response = await api.get(`${baseUrl}/freight/freightForwarder`);
     data = response.data.data;
   } catch (err) {
     console.log(err);

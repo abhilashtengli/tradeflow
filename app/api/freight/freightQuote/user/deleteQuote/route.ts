@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 const prisma = new PrismaClient();
@@ -9,11 +11,18 @@ const validateId = z.object({
 export async function DELETE(request: NextRequest) {
   // here add logged in user id
   // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
-      const userId = (await request.headers.get("x-user-id")) as string;
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ message: "Please login!" });
+  }
+
+  const userId = session?.user.id;
 
   try {
-      const body = await request.json();
-      console.log(body);
+    const body = await request.json();
+    console.log(body);
 
     const result = validateId.safeParse(body);
 

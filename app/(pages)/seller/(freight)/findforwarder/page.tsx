@@ -1,37 +1,30 @@
 import React from "react";
 import { baseUrl } from "@/app/config";
 import { FindForwarder } from "@/components/seller/FindForwarder";
-import axios from "axios";
-// import { createAuthorizedAxios } from "@/lib/authHelper";
+import { createAuthorizedAxios } from "@/lib/authHelper";
+import FreightFowrderComponent from "./FfComponent.tsx/page";
 
 const page = async () => {
   let data = [];
   let bookingDetails = [];
   try {
-    // const api = await createAuthorizedAxios();
-    const response = await axios.get(
-      `${baseUrl}/freight/freightForwarder/getAll`,
-      {
-        withCredentials: true
-      }
+    const api = await createAuthorizedAxios();
+    const response = await api.get(
+      `${baseUrl}/freight/freightForwarder/getAll`
     );
     data = response.data.data;
 
-    const bookings = await axios.get(
-      `${baseUrl}/freight/freightBooking/getBookings/userBookings?`,
-      {
-        withCredentials: true
-      }
+    const bookings = await api.get(
+      `${baseUrl}/freight/freightBooking/getBookings/userBookings?`
     );
     bookingDetails = bookings.data.data;
   } catch (err) {
     console.log("could not fetch Users", err);
   }
-  // console.log("BookingDetails", data);
 
   return (
     <div>
-      <FindForwarder users={data} bookings={bookingDetails} />
+      <FreightFowrderComponent users={data} bookings={bookingDetails} />
     </div>
   );
 };

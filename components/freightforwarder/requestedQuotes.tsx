@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { baseUrl } from "@/app/config";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 type Quote = {
   id: string;
@@ -37,7 +38,8 @@ export function RequestedQuotes({
   const [quotes, setQuotes] = useState<Quote[]>(requestedQuotes);
   const [price, setPrice] = useState<number | undefined>();
   const [currency, setCurrency] = useState<string | undefined>();
-
+  const { data: session } = useSession();
+  const token = session?.accessToken;
   const handleSendQuote = async (quote: Quote) => {
     const data = {
       freightQuoteId: quote.id,
@@ -49,13 +51,18 @@ export function RequestedQuotes({
     try {
       const response = await axios.patch(
         `${baseUrl}/freight/freightQuote`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data);
 
       if (response.status === 200) {
         // Remove the quote from the list after sending
-        setQuotes(quotes.filter(q => q.id !== quote.id));
+        setQuotes(quotes.filter((q) => q.id !== quote.id));
       }
     } catch (error) {
       console.error("Error sending quote:", error);
@@ -64,67 +71,55 @@ export function RequestedQuotes({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {quotes.map(quote =>
+      {quotes.map((quote) => (
         <Card key={quote.id}>
           <CardContent className="p-4">
             <h2 className="text-lg text-zinc-700 font-semibold mb-2">
               Quote ID: {quote.id}
             </h2>
-            <p>
-              Origin: {quote.freightBooking.origin}
-            </p>
-            <p>
-              Destination: {quote.freightBooking.destination}
-            </p>
-            <p>
-              Product: {quote.freightBooking.product}
-            </p>
-            <p>
-              Product Unit: {quote.freightBooking.productUnit}
-            </p>
+            <p>Origin: {quote.freightBooking.origin}</p>
+            <p>Destination: {quote.freightBooking.destination}</p>
+            <p>Product: {quote.freightBooking.product}</p>
+            <p>Product Unit: {quote.freightBooking.productUnit}</p>
             <p>
               Departure Date:{" "}
               {new Date(
                 quote.freightBooking.departureDate
               ).toLocaleDateString()}
             </p>
-            <p>
-              Load: {quote.freightBooking.load}
-            </p>
-            <p>
-              No. of Containers: {quote.freightBooking.noOfContainers}
-            </p>
+            <p>Load: {quote.freightBooking.load}</p>
+            <p>No. of Containers: {quote.freightBooking.noOfContainers}</p>
             <p>
               Container Type:{" "}
               {quote.freightBooking.containerType === "Type_20"
                 ? "20 ft"
                 : quote.freightBooking.containerType === "Type_40"
-                  ? "40 ft"
-                  : "Unknown"}
+                ? "40 ft"
+                : "Unknown"}
             </p>
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <Input
               type="number"
               placeholder="Set Price"
-              onChange={e => setPrice(parseInt(e.target.value))}
+              onChange={(e) => setPrice(parseInt(e.target.value))}
             />
-            <Select onValueChange={value => setCurrency(value)}>
+            <Select onValueChange={(value) => setCurrency(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Currency" />
               </SelectTrigger>
               <SelectContent>
-                {["USD", "EURO", "GBP", "INR", "RUB", "CNY"].map(curr =>
+                {["USD", "EURO", "GBP", "INR", "RUB", "CNY"].map((curr) => (
                   <SelectItem key={curr} value={curr}>
                     {curr}
                   </SelectItem>
-                )}
+                ))}
               </SelectContent>
             </Select>
             <Button onClick={() => handleSendQuote(quote)}>Send Quote</Button>
           </CardFooter>
         </Card>
-      )}
+      ))}
     </div>
   );
 }

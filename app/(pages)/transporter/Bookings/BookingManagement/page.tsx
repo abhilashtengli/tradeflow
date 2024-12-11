@@ -7,6 +7,7 @@ import { DispatchedBookings } from "@components/transporter/dispatchedBookings";
 import { DeliveredBookings } from "@components/transporter/deliveredBookings";
 import { baseUrl } from "@/app/config";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 interface Booking {
   id: string;
@@ -33,12 +34,13 @@ export default function BookingManagement({
 }: BookingManagementProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [acceptedBookings, setAcceptedBookings] = useState<Booking[]>(accepted);
-  const [dispatchedBookings, setDispatchedBookings] = useState<Booking[]>(
-    dispatched
-  );
-  const [deliveredBookings, setDeliveredBookings] = useState<Booking[]>(
-    delivered
-  );
+  const [dispatchedBookings, setDispatchedBookings] =
+    useState<Booking[]>(dispatched);
+  const [deliveredBookings, setDeliveredBookings] =
+    useState<Booking[]>(delivered);
+
+  const { data: session } = useSession();
+  const token = session?.accessToken;
 
   const handleBookingUpdate = async (updatedBooking: Booking) => {
     try {
@@ -53,12 +55,17 @@ export default function BookingManagement({
 
       const response = await axios.patch(
         `${baseUrl}/transportation/tsInput`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data.data);
 
       setAcceptedBookings(
-        acceptedBookings.filter(booking => booking.id !== updatedBooking.id)
+        acceptedBookings.filter((booking) => booking.id !== updatedBooking.id)
       );
       setDispatchedBookings([...dispatchedBookings, response.data.data]);
     } catch (error) {
@@ -74,12 +81,17 @@ export default function BookingManagement({
       };
       const response = await axios.patch(
         `${baseUrl}/transportation/tsInput`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data.data);
 
       setDispatchedBookings(
-        dispatchedBookings.filter(booking => booking.id !== updatedBooking.id)
+        dispatchedBookings.filter((booking) => booking.id !== updatedBooking.id)
       );
       setDeliveredBookings([...deliveredBookings, response.data.data]);
     } catch (error) {
@@ -98,7 +110,9 @@ export default function BookingManagement({
           <TabsTrigger value="dispatched">
             Dispatched Bookings ({dispatchedBookings.length})
           </TabsTrigger>
-          <TabsTrigger value="delivered">Delivered Bookings ({deliveredBookings.length})</TabsTrigger>
+          <TabsTrigger value="delivered">
+            Delivered Bookings ({deliveredBookings.length})
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="accepted">
           <AcceptedBookings

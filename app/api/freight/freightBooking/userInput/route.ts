@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -24,9 +26,9 @@ const validateInput = z.object({
   ]),
   departureDate: z
     .string()
-    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
+    .refine((date) => !isNaN(Date.parse(date)), "Invalid date format")
     .refine(
-      date => new Date(date) >= new Date(),
+      (date) => new Date(date) >= new Date(),
       "Departure date cannot be in the past"
     ),
   load: z.number().min(1).max(28),
@@ -39,9 +41,13 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    
-        const userSellerId = (await request.headers.get("x-user-id")) as string;
+    const session = await getServerSession(authOptions);
 
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userSellerId = session?.user.id;
 
     const body = await request.json();
     console.log(body);

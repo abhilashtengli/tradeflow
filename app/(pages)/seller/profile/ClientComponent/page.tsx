@@ -3,6 +3,7 @@
 import { baseUrl } from "@/app/config";
 import { createAuthorizedAxios } from "@/lib/authHelper";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -14,7 +15,7 @@ interface Data {
   country: string;
 }
 
-export default  function ClientComponent({ data }: { data: Data }) {
+export default function ClientComponent({ data }: { data: Data }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -24,7 +25,9 @@ export default  function ClientComponent({ data }: { data: Data }) {
     country: undefined,
     password: undefined
   });
-  // const api = await createAuthorizedAxios();
+  const { data: session } = useSession();
+  const token = session?.accessToken;
+  
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
     setError("");
@@ -35,7 +38,11 @@ export default  function ClientComponent({ data }: { data: Data }) {
     console.log(updatedData);
 
     try {
-      const response = await axios.patch(`${baseUrl}/user`, updatedData);
+      const response = await axios.patch(`${baseUrl}/user`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       console.log(response.data);
     } catch (err) {
       console.log(err);
@@ -71,9 +78,7 @@ export default  function ClientComponent({ data }: { data: Data }) {
             <h2 className="text-3xl font-bold text-gray-800 mt-1">
               {data.name}
             </h2>
-            <p className="text-gray-600">
-              {data.email}
-            </p>
+            <p className="text-gray-600">{data.email}</p>
           </div>
           <div className="mt-4 sm:mt-0">
             <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-full shadow">
@@ -146,21 +151,15 @@ export default  function ClientComponent({ data }: { data: Data }) {
             </button>
             <button
               type="submit"
-              className={`mt-4 px-4 py-2 rounded ${loading
-                ? "bg-gray-400"
-                : "bg-blue-500"} text-white`}
+              className={`mt-4 px-4 py-2 rounded ${
+                loading ? "bg-gray-400" : "bg-blue-500"
+              } text-white`}
               disabled={loading}
             >
               {loading ? "Updating..." : "Update Profile"}
             </button>
-            {success &&
-              <p className="text-green-500 mt-2">
-                {success}
-              </p>}
-            {error &&
-              <p className="text-red-500 mt-2">
-                {error}
-              </p>}
+            {success && <p className="text-green-500 mt-2">{success}</p>}
+            {error && <p className="text-red-500 mt-2">{error}</p>}
           </div>
         </form>
       </div>

@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { useSession } from "next-auth/react";
 
 type Users = {
   id: string;
@@ -37,6 +38,9 @@ export function FindForwarder({
   );
   const [isRequestQuoteOpen, setIsRequestQuoteOpen] = useState(false);
 
+  const { data: session } = useSession();
+  const token = session?.accessToken;
+
   const handleRequestQuote = (forwarderId: string) => {
     setSelectedForwarder(forwarderId);
     setIsRequestQuoteOpen(true);
@@ -61,7 +65,12 @@ export function FindForwarder({
     try {
       const response = await axios.post(
         `${baseUrl}/freight/freightQuote/requestFreightQuote`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data);
     } catch (err) {
@@ -81,23 +90,21 @@ export function FindForwarder({
         <div className="md:w-full space-y-4">
           <FreightBookingForm onSubmit={handleBookingSubmit} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {freightForwarders.map(forwarder =>
+            {freightForwarders.map((forwarder) => (
               <FreightForwarderCard
                 key={forwarder.id}
                 {...forwarder}
                 onRequestQuote={() => handleRequestQuote(forwarder.id)}
               />
-            )}
+            ))}
           </div>
         </div>
         <div className="md:w-1/2 space-y-4">
-          {bookingDetails.map(booking =>
+          {bookingDetails.map((booking) => (
             <Card key={booking.id}>
               <CardHeader>
                 <CardTitle>Freight Booking Details</CardTitle>
-                <span className="text-sm ">
-                  Booking Id : {booking.id}
-                </span>
+                <span className="text-sm ">Booking Id : {booking.id}</span>
               </CardHeader>
               <CardContent>
                 <p>
@@ -131,23 +138,24 @@ export function FindForwarder({
                   {booking.containerType === "Type_20"
                     ? "20 ft"
                     : booking.containerType === "Type_40"
-                      ? "40 ft"
-                      : "Unkown type"}
+                    ? "40 ft"
+                    : "Unkown type"}
                 </p>
               </CardContent>
             </Card>
-          )}
+          ))}
           <Dialog
             open={isRequestQuoteOpen}
             onOpenChange={setIsRequestQuoteOpen}
           >
             <DialogContent>
-              {selectedForwarder &&
+              {selectedForwarder && (
                 <RequestQuoteCard
                   bookings={bookingDetails}
                   freightForwarderId={selectedForwarder}
                   onConfirm={handleConfirmQuote}
-                />}
+                />
+              )}
             </DialogContent>
           </Dialog>
         </div>

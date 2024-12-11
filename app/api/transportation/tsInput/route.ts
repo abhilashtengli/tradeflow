@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -15,7 +17,7 @@ const tsValidation = z.object({
       "Curtain_Side_Truck"
     ])
     .optional(),
-  load: z.number().optional(), 
+  load: z.number().optional(),
   transportationId: z.string(),
   dispatched: z.boolean().optional(),
   delivered: z.boolean().optional(),
@@ -29,7 +31,17 @@ const prisma = new PrismaClient();
 
 export async function PATCH(request: NextRequest) {
   // const tsId = "30f0e50e-99da-456c-b873-b19565c451b0";
-  const tsId = (await request.headers.get("x-user-id")) as string;
+  // const tsId = (await request.headers.get("x-user-id")) as string;
+
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({
+      message: "Please login!"
+    });
+  }
+
+  const tsId = session.user.id;
 
   const body = await request.json();
   console.log(body);
@@ -53,8 +65,8 @@ export async function PATCH(request: NextRequest) {
 
   if (res?.accepted === true) {
     return NextResponse.json({
-      message : "This request is already accepted by someone"
-    })
+      message: "This request is already accepted by someone"
+    });
   }
 
   const update = await prisma.transportation.update({

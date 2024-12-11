@@ -80,7 +80,6 @@ export default function QuotationSection() {
   const [requestedQuotes, setRequestedQuotes] = useState<Quote[]>([]);
   const [sentQuotes, setSentQuotes] = useState<Quote[]>([]);
   const { data: session } = useSession();
-  //   console.log(session);
   const token = session?.accessToken;
 
   useEffect(() => {
@@ -151,7 +150,12 @@ export default function QuotationSection() {
 
       await axios.patch(
         `${baseUrl}/product/productQuote/sellerQuote`,
-        updatedQuote
+        updatedQuote,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       setNewQuote({
         price: "",

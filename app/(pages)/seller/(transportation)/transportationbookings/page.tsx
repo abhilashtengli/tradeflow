@@ -2,6 +2,7 @@ import { baseUrl } from "@/app/config";
 import axios from "axios";
 import React from "react";
 import BookingsPage from "./BookingsPage/BookingsPage";
+import ClientB from "./ClientBookingPage/ClientB";
 
 const page = async () => {
   let data = [];
@@ -17,7 +18,7 @@ const page = async () => {
   }
   return (
     <div className="px-5">
-      <BookingsPage data={data} />
+      <ClientB data={data} />
     </div>
   );
 };

@@ -4,6 +4,7 @@ import React from "react";
 import QuotationsSection from "./QuoteSection/page";
 // import axios from "axios";
 import { createAuthorizedAxios } from "@/lib/authHelper";
+import QuoteSectionProvider from "./QuoteSectionProvider/page";
 // import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const page = async () => {
@@ -38,7 +39,8 @@ const page = async () => {
   }
   return (
     <div>
-      <QuotationsSection requested={requestedQuote} received={receivedQuote} />
+     
+      <QuoteSectionProvider requested={requestedQuote} received={receivedQuote} />
     </div>
   );
 };

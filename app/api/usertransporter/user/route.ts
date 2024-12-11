@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -9,7 +11,16 @@ export async function GET(request: NextRequest) {
   // const userId = request.headers.get("x-user-id") as string;
 
   try {
-    const id = (await request.headers.get("x-user-id")) as string;
+    // const id = (await request.headers.get("x-user-id")) as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({
+        message: "Please login!"
+      });
+    }
+    const id = session.user.id;
 
     const user = await prisma.userTransporter.findUnique({
       where: {

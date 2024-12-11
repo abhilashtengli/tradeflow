@@ -2,6 +2,8 @@
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { CreateProduct } from "./productValidation/route";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +12,16 @@ export async function POST(request: NextRequest) {
 
   try {
     // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
-    const userId = (await request.headers.get("x-user-id")) as string;
+    // const userId = (await request.headers.get("x-user-id")) as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userId = session.user.id;
+
     const body = await request.json();
     console.log(body);
 
@@ -111,7 +122,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data: products
     });
-    
   } catch (err) {
     return NextResponse.json({
       error: err

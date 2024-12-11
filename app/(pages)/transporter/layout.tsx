@@ -1,16 +1,17 @@
 import { baseUrl } from "@/app/config";
 import Sidebar from "@/components/transporter/sidebarComponent";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
-import axios from "axios";
 import { Bell } from "lucide-react";
 import { UserMenu } from "./components/UseMenu";
+import { createAuthorizedAxios } from "@/lib/authHelper";
+import { SessionProvider } from "next-auth/react";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
-    const response = await axios.get(`${baseUrl}/usertransporter/user`);
+    const api = await createAuthorizedAxios();
+    const response = await api.get(`${baseUrl}/usertransporter/user`);
     data = response.data.data;
   } catch (err) {
     console.log(err);
@@ -33,7 +34,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
         </header>
-        {children}
+        <SessionProvider>{children}</SessionProvider>   
         <Toaster />
       </main>
     </div>

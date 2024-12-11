@@ -1,13 +1,21 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   // here add logged in user id
-  const userId = "627826c7-0e32-4a01-ac93-0f4cbd05e169";
-  // const userId = (await request.headers.get("x-user-id")) as string;
-
+  // const userId = "627826c7-0e32-4a01-ac93-0f4cbd05e169";
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userId = session?.user.id;
     const response = await prisma.freightQuote.findMany({
       where: {
         userId: userId,

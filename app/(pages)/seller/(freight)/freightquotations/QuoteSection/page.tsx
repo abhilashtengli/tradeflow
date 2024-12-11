@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { baseUrl } from "@/app/config";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 type Quote = {
   id: string;
@@ -45,12 +46,18 @@ export default function QuotationsSection({
 }) {
   const [requestedQuotes, setRequestedQuotes] = useState<Quote[]>(requested);
   const [receivedQuotes, setReceivedQuotes] = useState<Quote[]>(received);
-
+  const { data: session } = useSession();
+  const token = session?.accessToken;
   const fetchQuotes = async () => {
     try {
       try {
         const requested = await axios.get(
-          `${baseUrl}/freight/freightQuote/user/getRequestedQuote`
+          `${baseUrl}/freight/freightQuote/user/getRequestedQuote`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
         setRequestedQuotes(requested.data?.data);
       } catch (err) {
@@ -58,7 +65,12 @@ export default function QuotationsSection({
       }
       try {
         const received = await axios.get(
-          `${baseUrl}/freight/freightQuote/user/getReceivedQuote`
+          `${baseUrl}/freight/freightQuote/user/getReceivedQuote`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         );
         setReceivedQuotes(received.data?.data);
       } catch (err) {
@@ -78,10 +90,15 @@ export default function QuotationsSection({
     try {
       const response = await axios.patch(
         `${baseUrl}/freight/freightBooking/userInput/confirmBooking`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       if (response.status === 200) {
-          fetchQuotes();
+        fetchQuotes();
       }
     } catch (error) {
       console.error("Error accepting quote:", error);
@@ -97,13 +114,18 @@ export default function QuotationsSection({
     try {
       const response = await axios.patch(
         `${baseUrl}/freight/freightBooking/userInput/confirmBooking`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
 
       console.log(response.data);
 
       if (response.status === 200) {
-       fetchQuotes()
+        fetchQuotes();
       }
     } catch (error) {
       console.error("Error rejecting quote:", error);
@@ -115,7 +137,13 @@ export default function QuotationsSection({
     try {
       const response = await axios.delete(
         `${baseUrl}/freight/freightQuote/user/deleteQuote`,
-        { data } // Add payload under `data`
+        {
+          data,
+
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        } // Add payload under `data`,
       );
 
       console.log(response.data);

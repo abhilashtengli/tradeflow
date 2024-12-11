@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 const validateUpdateInput = z.object({
@@ -8,16 +10,16 @@ const validateUpdateInput = z.object({
   noOfContainersBooked: z.number().min(1),
   departureDate: z
     .string()
-    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
+    .refine((date) => !isNaN(Date.parse(date)), "Invalid date format")
     .refine(
-      date => new Date(date) >= new Date(),
+      (date) => new Date(date) >= new Date(),
       "Departure date cannot be in the past"
     ),
   expectedArrivalDate: z
     .string()
-    .refine(date => !isNaN(Date.parse(date)), "Invalid date format")
+    .refine((date) => !isNaN(Date.parse(date)), "Invalid date format")
     .refine(
-      date => new Date(date) >= new Date(),
+      (date) => new Date(date) >= new Date(),
       "Expected arrival date cannot be in the past"
     )
 });
@@ -73,7 +75,15 @@ export async function PATCH(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // const userId = request.headers.get("x-user-id") as string;
-    const sellerId = (await request.headers.get("x-user-id")) as string;
+    // const sellerId = (await request.headers.get("x-user-id")) as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const sellerId = session?.user.id;
 
     const data = await prisma.productBooking.findMany({
       where: {

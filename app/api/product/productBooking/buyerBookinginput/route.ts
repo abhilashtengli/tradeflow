@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 const prisma = new PrismaClient();
@@ -23,7 +25,15 @@ export async function POST(request: NextRequest) {
 
   try {
     // const buyerId = request.headers.get("x-user-id") as string;
-    const buyerId = (await request.headers.get("x-user-id")) as string;
+    // const buyerId = (await request.headers.get("x-user-id")) as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const buyerId = session?.user.id;
 
     const body = await request.json();
     console.log(body);
@@ -109,9 +119,18 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
-    const userId = request.headers.get("x-user-id") as string;
+    // const userId = request.headers.get("x-user-id") as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userId = session?.user.id;
 
     const bookingData = await prisma.productBooking.findMany({
       where: {

@@ -3,7 +3,7 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
   const publicFrontendPaths = ["/signin", "/signup"];
-  const publicBackendPaths = ["/api/auth/"];
+  const publicBackendPaths = ["/api/auth/", "/api/getUserRole"];
   const path = request.nextUrl.pathname;
 
   // Allow public paths

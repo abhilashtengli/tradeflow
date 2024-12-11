@@ -5,18 +5,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookingCard } from "@/components/seller/transportation/booking-card";
 import { EditBookingDialog } from "@/components/seller/transportation/edit-booking-dailog";
 import { Toaster } from "@/components/ui/toaster";
-import type { Booking } from "@/types/booking";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { Booking } from "@/app/types/booking";
+import { useSession } from "next-auth/react";
 
 interface BookingsPageProps {
-  data: Booking[];
+  data: Booking[] | null;
 }
 
 export default function BookingsPage({ data }: BookingsPageProps) {
-  const [bookingData, setBookingData] = useState(data);
+  const [bookingData, setBookingData] = useState<Booking[]>(data || []);
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const { data: session } = useSession();
+  const token = session?.accessToken;
 
   const pendingBookings = bookingData.filter((booking) => !booking.accepted);
   const acceptedBookings = bookingData.filter(
@@ -33,30 +36,65 @@ export default function BookingsPage({ data }: BookingsPageProps) {
   };
 
   const fetchUpdatedData = async () => {
-    const response = await axios.get(
-      `${baseUrl}/transportation/userInput/getBookings`
-    );
-    data = response.data?.data;
-    setBookingData(data);
+    try {
+      const response = await axios.get(
+        `${baseUrl}/transportation/userInput/getBookings`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      const updatedData = response.data?.data || [];
+      setBookingData(updatedData);
+    } catch (error) {
+      console.error("Error fetching updated data:", error);
+      // Handle error (e.g., show a toast notification)
+    }
   };
 
   const handleUpdate = async (
     bookingId: string,
     updatedData: Partial<Booking>
   ) => {
-    // This would be an API call in a real application
-    const data = {
-      ...updatedData,
-      bookingId: bookingId
-    };
-    // console.log(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const response = await axios.patch(
-      `${baseUrl}/transportation/userInput`,
-      data
+    try {
+      const data = {
+        ...updatedData,
+        bookingId: bookingId
+      };
+      await axios.patch(
+        `${baseUrl}/transportation/userInput`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      await fetchUpdatedData();
+    } catch (error) {
+      console.error("Error updating booking:", error);
+      // Handle error (e.g., show a toast notification)
+    }
+  };
+
+  const renderBookings = (bookings: Booking[]) => {
+    if (bookings.length === 0) {
+      return <p className="text-center text-gray-500">No bookings found.</p>;
+    }
+
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {bookings.map((booking) => (
+          <BookingCard
+            key={booking.id}
+            booking={booking}
+            onEdit={() => handleEdit(booking)}
+            isPending={!booking.accepted}
+          />
+        ))}
+      </div>
     );
-    fetchUpdatedData();
-    // console.log(response.data);
   };
 
   return (
@@ -80,40 +118,19 @@ export default function BookingsPage({ data }: BookingsPageProps) {
         </TabsList>
 
         <TabsContent value="pending" className="w-full">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {pendingBookings.map((booking) => (
-              <BookingCard
-                key={booking.id}
-                booking={booking}
-                onEdit={() => handleEdit(booking)}
-                isPending
-              />
-            ))}
-          </div>
+          {renderBookings(pendingBookings)}
         </TabsContent>
 
         <TabsContent value="accepted" className="w-full">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {acceptedBookings.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} />
-            ))}
-          </div>
+          {renderBookings(acceptedBookings)}
         </TabsContent>
 
         <TabsContent value="dispatched" className="w-full">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {dispatchedBookings.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} />
-            ))}
-          </div>
+          {renderBookings(dispatchedBookings)}
         </TabsContent>
 
         <TabsContent value="delivered" className="w-full">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {deliveredBookings.map((booking) => (
-              <BookingCard key={booking.id} booking={booking} />
-            ))}
-          </div>
+          {renderBookings(deliveredBookings)}
         </TabsContent>
       </Tabs>
 
@@ -130,3 +147,4 @@ export default function BookingsPage({ data }: BookingsPageProps) {
     </div>
   );
 }
+

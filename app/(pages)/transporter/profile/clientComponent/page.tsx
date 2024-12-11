@@ -2,6 +2,7 @@
 
 import { baseUrl } from "@/app/config";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -26,6 +27,9 @@ export default function ClientComponent({ data }: { data: Data }) {
     companyName: data.companyName || "",
     companyAddress: data.companyAddress || ""
   });
+
+  const { data: session } = useSession();
+  const token = session?.accessToken;
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
     setError("");
@@ -41,7 +45,12 @@ export default function ClientComponent({ data }: { data: Data }) {
     try {
       const response = await axios.patch(
         `${baseUrl}/usertransporter`,
-        submissionData
+        submissionData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data);
       setFormData({ ...formData, password: "" });
@@ -78,9 +87,7 @@ export default function ClientComponent({ data }: { data: Data }) {
             <h2 className="text-3xl font-bold text-gray-800 mt-1">
               {data.name}
             </h2>
-            <p className="text-gray-600">
-              {data.email}
-            </p>
+            <p className="text-gray-600">{data.email}</p>
           </div>
           <div className="mt-4 sm:mt-0 font-semibold text-zinc-700">
             {data.companyName?.toUpperCase()}
@@ -165,21 +172,15 @@ export default function ClientComponent({ data }: { data: Data }) {
             </button>
             <button
               type="submit"
-              className={`mt-4 px-4 py-2 rounded ${loading
-                ? "bg-gray-400"
-                : "bg-blue-500"} text-white`}
+              className={`mt-4 px-4 py-2 rounded ${
+                loading ? "bg-gray-400" : "bg-blue-500"
+              } text-white`}
               disabled={loading}
             >
               {loading ? "Updating..." : "Update Profile"}
             </button>
-            {success &&
-              <p className="text-green-500 mt-2">
-                {success}
-              </p>}
-            {error &&
-              <p className="text-red-500 mt-2">
-                {error}
-              </p>}
+            {success && <p className="text-green-500 mt-2">{success}</p>}
+            {error && <p className="text-red-500 mt-2">{error}</p>}
           </div>
         </form>
       </div>

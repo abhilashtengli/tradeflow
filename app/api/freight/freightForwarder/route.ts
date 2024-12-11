@@ -1,4 +1,6 @@
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -14,14 +16,22 @@ const ValidateUpdate = z.object({
 
 export async function PATCH(request: NextRequest) {
   try {
-    // const userId = request.headers.get("x-user-id") as string;
-    const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
-    const body = await request.json();
-    const { success } = await ValidateUpdate.safeParse(body);
+    // const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
+    const session = await getServerSession(authOptions);
 
-    if (!success) {
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userId = session?.user.id;
+
+    const body = await request.json();
+    const result = await ValidateUpdate.safeParse(body);
+
+    if (!result.success) {
       return NextResponse.json({
-        message: "Invalid inputs for the update request"
+        message: "Invalid inputs for the update request",
+        error: result.error.errors
       });
     }
 
@@ -47,10 +57,18 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     // const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
-    const userId = (await request.headers.get("x-user-id")) as string;
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userId = session?.user.id;
 
     const response = await prisma.freightForwarder.findUnique({
       where: {

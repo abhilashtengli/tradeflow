@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
 
-const userUpdate = z
-  .object({
-    name: z.string().min(2).max(50).optional(),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .optional(),
-    email: z.string().optional(),
-    country: z.string().optional()
-  })
+const userUpdate = z.object({
+  name: z.string().min(2).max(50).optional(),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .optional(),
+  email: z.string().optional(),
+  country: z.string().optional()
+});
 const prisma = new PrismaClient();
 
 //GetAll Users
@@ -20,6 +21,12 @@ const prisma = new PrismaClient();
 export async function GET(request: NextRequest) {
   try {
     const users = await prisma.user.findMany();
+
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
 
     return NextResponse.json({
       users: users
@@ -37,8 +44,14 @@ export async function PATCH(request: NextRequest) {
   console.log("reached be");
 
   try {
-    // const userId = request.headers.get("x-user-id") as string;
-    const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+    // const userId = "5dcb6f85-2f53-467c-b9d7-e4ff853b8d4a";
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ message: "Please login!" });
+    }
+
+    const userId = session.user.id;
 
     const user = await prisma.user.findUnique({
       where: {

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Booking } from "../../../app/(pages)/freightForwarder/bookings/Booking";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { useSession } from "next-auth/react";
 
 type DispatchedBookingsProps = {
   bookings: Booking[];
@@ -14,7 +15,8 @@ export function DispatchedBookings({
   updateBooking
 }: DispatchedBookingsProps) {
   // console.log(bookings);
-
+  const { data: session } = useSession();
+  const token = session?.accessToken;
   const handleDeliver = async (booking: Booking) => {
     try {
       const data = {
@@ -23,7 +25,12 @@ export function DispatchedBookings({
       };
       const response = await axios.patch(
         `${baseUrl}/freight/freightBooking/userFreightForwarderInput/freightDelivered`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       if (response.status === 200) {
         updateBooking({ ...booking, isDelivered: true });

@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import type { Booking } from "@/types/Booking";
+import { Booking } from "@/app/types/booking";
 
 const indianDistricts = [
   "Agra",
@@ -151,11 +151,11 @@ export function EditBookingDialog({
                 <SelectValue placeholder="Select origin" />
               </SelectTrigger>
               <SelectContent className="h-80">
-                {indianDistricts.map((district) => (
+                {indianDistricts.map(district =>
                   <SelectItem key={district} value={district}>
                     {district}
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -166,11 +166,11 @@ export function EditBookingDialog({
                 <SelectValue placeholder="Select destination" />
               </SelectTrigger>
               <SelectContent>
-                {indianPorts.map((ports) => (
+                {indianPorts.map(ports =>
                   <SelectItem key={ports} value={ports}>
                     {ports}
                   </SelectItem>
-                ))}
+                )}
               </SelectContent>
             </Select>
           </div>

@@ -13,6 +13,7 @@ import { Booking } from "../../../app/(pages)/freightForwarder/bookings/Booking"
 import axios from "axios";
 import { baseUrl } from "@/app/config";
 import { Label } from "@/components/ui/label";
+import { useSession } from "next-auth/react";
 
 type ConfirmedBookingsProps = {
   bookings: Booking[];
@@ -24,6 +25,8 @@ export function ConfirmedBookings({
   updateBooking
 }: ConfirmedBookingsProps) {
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
+  const { data: session } = useSession();
+  const token = session?.accessToken;
 
   const handleEdit = (booking: Booking) => {
     setEditingBooking(booking);
@@ -59,7 +62,12 @@ export function ConfirmedBookings({
 
       const response = await axios.patch(
         `${baseUrl}/freight/freightBooking/userFreightForwarderInput`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data);
 
@@ -76,17 +84,21 @@ export function ConfirmedBookings({
     try {
       const data = {
         bookingId: booking.id,
-        dispatched : true
-      }
+        dispatched: true
+      };
       const response = await axios.patch(
         `${baseUrl}/freight/freightBooking/userFreightForwarderInput/freightDispatched`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       console.log(response.data);
-      
+
       if (response.status === 200) {
-        updateBooking({ ...booking, dispatched
-: true });
+        updateBooking({ ...booking, dispatched: true });
       }
     } catch (error) {
       console.error("Error dispatching booking:", error);
@@ -380,7 +392,11 @@ export function ConfirmedBookings({
             <div className="flex flex-col">
               <Button
                 onClick={() => handleDispatch(booking)}
-                disabled={!booking.price || booking.paymentStatus === "PENDING" || booking.paymentStatus === "CANCELLED"}
+                disabled={
+                  !booking.price ||
+                  booking.paymentStatus === "PENDING" ||
+                  booking.paymentStatus === "CANCELLED"
+                }
               >
                 Dispatch
               </Button>

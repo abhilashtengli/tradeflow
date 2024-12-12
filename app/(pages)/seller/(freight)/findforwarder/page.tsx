@@ -1,6 +1,5 @@
 import React from "react";
 import { baseUrl } from "@/app/config";
-import { FindForwarder } from "@/components/seller/FindForwarder";
 import { createAuthorizedAxios } from "@/lib/authHelper";
 import FreightFowrderComponent from "./FfComponent.tsx/page";
 

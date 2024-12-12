@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Banknote, MapPin, Package, Ruler, Truck } from "lucide-react";
-import type { Booking } from "@/types/booking";
+import { Booking } from "@/app/types/booking";
 
 interface BookingCardProps {
   booking: Booking;
@@ -36,7 +36,9 @@ export function BookingCard({
             <MapPin className="h-4 w-4" />
             <div>
               <p className="text-sm font-medium">Origin</p>
-              <p className="text-sm text-muted-foreground">{booking.origin}</p>
+              <p className="text-sm text-muted-foreground">
+                {booking.origin}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -60,11 +62,11 @@ export function BookingCard({
             </div>
           </div>
           <div className="flex items-center gap-2">
-           <Ruler className="h-4 w-4 text-gray-600" />
+            <Ruler className="h-4 w-4 text-gray-600" />
             <div>
               <p className="text-sm font-medium">Distance</p>
               <p className="text-sm text-muted-foreground">
-                 {booking.distance.toFixed(2)} Kms
+                {booking.distance.toFixed(2)} Kms
               </p>
             </div>
           </div>
@@ -87,7 +89,7 @@ export function BookingCard({
             </div>
           </div>
         </div>
-        {booking.transporter && (
+        {booking.transporter &&
           <div className="border-t pt-4">
             <p className="text-sm font-medium">Transporter Details</p>
             <p className="text-sm text-muted-foreground">
@@ -96,14 +98,12 @@ export function BookingCard({
             <p className="text-sm text-muted-foreground">
               {booking.transporter.companyAddress}
             </p>
-          </div>
-        )}
+          </div>}
         <div className=" flex justify-end ">
-          {isPending && (
+          {isPending &&
             <Button onClick={onEdit} size="sm">
               Edit Details
-            </Button>
-          )}
+            </Button>}
         </div>
       </CardContent>
     </Card>

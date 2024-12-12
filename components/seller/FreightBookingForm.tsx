@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { useSession } from "next-auth/react";
 
 interface FreightBookingFormProps {
   onSubmit: (data: FreightBookingData) => void;
@@ -37,6 +38,8 @@ export interface FreightBookingData {
 }
 
 export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
+  const { data: session } = useSession();
+  const token = session?.accessToken;
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [formData, setFormData] = useState<FreightBookingData>({
@@ -79,7 +82,12 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
     try {
       const response = await axios.post(
         `${baseUrl}/freight/freightBooking/userInput`,
-        data
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
 
       console.log(response.data);

@@ -20,6 +20,7 @@ type User = {
 };
 
 export function UserMenu({ data }: { data: User }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [userData, setuserData] = useState(data);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();

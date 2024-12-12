@@ -1,7 +1,6 @@
 import { baseUrl } from "@/app/config";
 import { BookingManagement } from "@/components/seller/Bookings/booking-management";
 import { createAuthorizedAxios } from "@/lib/authHelper";
-import axios from "axios";
 import React from "react";
 
 const page = async () => {

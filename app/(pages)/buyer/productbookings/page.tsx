@@ -1,19 +1,20 @@
 import { baseUrl } from "@/app/config";
-import axios from "axios";
 import Bookings from "./Bookings/page";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const ProductBookingsPage = async () => {
   try {
+    const api = await createAuthorizedAxios();
     const [
       responseDelivered,
       responseDispatched,
       responseBuyerConfirm,
       responseBookingConfirm
     ] = await Promise.all([
-      axios.get(`${baseUrl}/product/productBooking/getBookings/isDelivered`),
-      axios.get(`${baseUrl}/product/productBooking/getBookings/isDispatched`),
-      axios.get(`${baseUrl}/product/productBooking/getBookings/buyerConfirm`),
-      axios.get(`${baseUrl}/product/productBooking/getBookings/bookingConfirm`)
+      api.get(`${baseUrl}/product/productBooking/getBookings/isDelivered`),
+      api.get(`${baseUrl}/product/productBooking/getBookings/isDispatched`),
+      api.get(`${baseUrl}/product/productBooking/getBookings/buyerConfirm`),
+      api.get(`${baseUrl}/product/productBooking/getBookings/bookingConfirm`)
     ]);
 
     // Extract the arrays from the responses
@@ -21,7 +22,6 @@ const ProductBookingsPage = async () => {
     const dispatchedBookings = responseDispatched.data.data;
     const pendingBookings = responseBuyerConfirm.data.data;
     const confirmedBookings = responseBookingConfirm.data.data;
-
 
     return (
       <div className="p-4">

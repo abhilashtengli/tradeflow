@@ -1,14 +1,15 @@
 import { baseUrl } from "@/app/config";
-import axios from "axios";
 import React from "react";
-import ProductsPage from "./productsPage/page";
+import { createAuthorizedAxios } from "@/lib/authHelper";
+import Products from "./products/page";
 
 const page = async () => {
   let data = [];
   let error = undefined;
 
   try {
-    const response = await axios.get(`${baseUrl}/product`);
+    const api = await createAuthorizedAxios();
+    const response = await api.get(`${baseUrl}/product`);
     data = response.data.data;
   } catch (err) {
     console.error("Error fetching products:", err);
@@ -17,7 +18,7 @@ const page = async () => {
 
   return (
     <div>
-      <ProductsPage initialProducts={data} error={error} />
+      <Products initialProducts={data} error={error} />
     </div>
   );
 };

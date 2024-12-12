@@ -1,17 +1,18 @@
 import Sidebar from "@/components/buyer/sidebarComponent";
 import SearchBar from "@/components/Searchbar/searchbar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
 import { Bell } from "lucide-react";
 import { UserMenu } from "./components/UseMenu";
-import axios from "axios";
 import { baseUrl } from "@/app/config";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   let data;
   try {
-    const response = await axios.get(`${baseUrl}/user/getSigninUser`);
+    const api = await createAuthorizedAxios();
+
+    const response = await api.get(`${baseUrl}/user/getSigninUser`);
     data = response.data.data;
   } catch (err) {
     console.log(err);

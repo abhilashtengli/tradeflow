@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import axios from "axios";
 import { baseUrl } from "@/app/config";
-import { useSession } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 
 type Users = {
   id: string;
@@ -88,7 +88,9 @@ export function FindForwarder({
       <h1 className="text-2xl font-bold mb-4">Find Forwarder</h1>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="md:w-full space-y-4">
-          <FreightBookingForm onSubmit={handleBookingSubmit} />
+          <SessionProvider>
+            <FreightBookingForm onSubmit={handleBookingSubmit} />
+          </SessionProvider>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {freightForwarders.map((forwarder) => (
               <FreightForwarderCard

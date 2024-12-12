@@ -1,13 +1,14 @@
 import { baseUrl } from "@/app/config";
-import axios from "axios";
 import React from "react";
 import BookingPage from "./Booking";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const page = async () => {
   let Bookings = [];
 
   try {
-    const responsePending = await axios.get(
+    const api = await createAuthorizedAxios();
+    const responsePending = await api.get(
       `${baseUrl}/freight/freightBooking/getBookings`
     );
     Bookings = responsePending.data.data;

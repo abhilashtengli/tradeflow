@@ -7,7 +7,6 @@ import { UserMenu } from "./components/UseMenu";
 import { baseUrl } from "@/app/config";
 import { Toaster } from "@/components/ui/toaster";
 import { createAuthorizedAxios } from "@/lib/authHelper";
-import { SessionProvider } from "next-auth/react";
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   let data;

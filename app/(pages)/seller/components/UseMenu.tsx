@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 type User = {
   name: string;
@@ -20,6 +21,7 @@ type User = {
 };
 
 export function UserMenu({ data }: { data: User }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [userData, setUserdata] = useState(data);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -30,7 +32,8 @@ export function UserMenu({ data }: { data: User }) {
   };
 
   const handleLogout = () => {
-    // Implement logout logic here
+    signOut({ callbackUrl: "/signin" }); // Redirect after sign-out
+
     console.log("Logging out...");
   };
 
@@ -38,15 +41,18 @@ export function UserMenu({ data }: { data: User }) {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Avatar className="ml-4 cursor-pointer hover:opacity-80">
-                  <AvatarFallback>  {userData?.name ? userData.name.slice(0, 2).toUpperCase() : "??"}</AvatarFallback>
+          <AvatarFallback>
+            {" "}
+            {userData?.name ? userData.name.slice(0, 2).toUpperCase() : "??"}
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{ userData?.name}</p>
+            <p className="text-sm font-medium leading-none">{userData?.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-             {userData?.email}
+              {userData?.email}
             </p>
           </div>
         </DropdownMenuLabel>

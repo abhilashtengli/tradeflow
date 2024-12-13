@@ -43,14 +43,24 @@ export const authOptions: NextAuthOptions = {
             user.password
           );
           if (!isPasswordValid) throw new Error("Invalid password");
-          console.log(user);
+          // console.log(user);
 
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            userRole: "user"
-          };
+          if (user.role === "Seller") {
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              userRole: "Seller"
+            }; // Correctly set the role
+          }
+          if (user.role === "Buyer") {
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              userRole: "Buyer"
+            }; // Correctly set the role
+          }
         }
 
         if (userTs) {

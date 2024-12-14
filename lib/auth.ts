@@ -119,7 +119,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      console.log("Session callback triggered");
+      // console.log("Session callback triggered");
 
       if (token) {
         session.user = {

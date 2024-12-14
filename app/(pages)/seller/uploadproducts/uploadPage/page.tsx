@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Box, DollarSign, Globe, Package, Tag } from "lucide-react";
+import { Box, Globe, Package, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -193,10 +193,7 @@ export default function ProductForm() {
               <div className="grid gap-2">
                 <Label htmlFor="price">Price</Label>
                 <div className="relative">
-                  <DollarSign
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    size={16}
-                  />
+                  
                   <Input
                     id="price"
                     name="price"

@@ -14,11 +14,11 @@ const publicPaths = ["/signin", "/signup", "/api/auth", "/api/getUserRole"];
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  console.log(`Middleware processing path: ${path}`);
+  // console.log(`Middleware processing path: ${path}`);
 
   // Always allow public paths
   if (publicPaths.some(publicPath => path.startsWith(publicPath))) {
-    console.log(`Public path accessed: ${path}`);
+    // console.log(`Public path accessed: ${path}`);
     return NextResponse.next();
   }
 
@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
     cookieName: "next-auth.session-token"
   });
 
-  console.log(`Token found: ${!!token}`);
+  // console.log(`Token found: ${!!token}`);
 
   const dashboardPaths = {
     Seller: "/seller/dashboard",
@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
 
   // If no token and not a public path, redirect to signin
   if (!token) {
-    console.log(`No token, redirecting to signin`);
+    // console.log(`No token, redirecting to signin`);
     if (path.startsWith("/api/")) {
       // For API routes, return a 401 Unauthorized response
       return new NextResponse(
@@ -56,10 +56,10 @@ export async function middleware(request: NextRequest) {
   const userRole = token.userRole as UserRole;
   const userId = token.id;
 
-  console.log(`User role: ${userRole}, User ID: ${userId}`);
+  // console.log(`User role: ${userRole}, User ID: ${userId}`);
 
   if (!userRole || !userId) {
-    console.log(`Missing user role or ID, redirecting to signin`);
+    // console.log(`Missing user role or ID, redirecting to signin`);
     if (path.startsWith("/api/")) {
       // For API routes, return a 401 Unauthorized response
       return new NextResponse(
@@ -74,9 +74,9 @@ export async function middleware(request: NextRequest) {
 
   // If user is logged in and trying to access signin or signup, redirect to their dashboard
   if (path === "/signin" || path === "/signup") {
-    console.log(
-      `Logged in user accessing signin/signup, redirecting to dashboard`
-    );
+    // console.log(
+    //   `Logged in user accessing signin/signup, redirecting to dashboard`
+    // );
     return NextResponse.redirect(
       new URL(dashboardPaths[userRole], request.url)
     );
@@ -87,7 +87,7 @@ export async function middleware(request: NextRequest) {
     path.startsWith(route)
   );
   if (!isAllowedRoute) {
-    console.log(`User accessing unauthorized route, redirecting to dashboard`);
+    // console.log(`User accessing unauthorized route, redirecting to dashboard`);
     if (path.startsWith("/api/")) {
       // For API routes, return a 403 Forbidden response
       return new NextResponse(
@@ -100,7 +100,7 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  console.log(`Access granted to ${path}`);
+  // console.log(`Access granted to ${path}`);
   return NextResponse.next();
 }
 

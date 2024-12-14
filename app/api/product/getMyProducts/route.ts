@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     // const userId = request.headers.get("x-user-id") as string;
 
     const session = await getServerSession(authOptions);
+    console.log("Session: " + session);
 
     if (!session) {
       return NextResponse.json({ message: "Please login!" });
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
       }
     });
     return NextResponse.json({
-      products: userProducts
+      data: userProducts
     });
   } catch (err) {
     return NextResponse.json({

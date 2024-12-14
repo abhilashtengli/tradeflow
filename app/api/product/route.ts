@@ -1,7 +1,7 @@
 // Create product , get All product , Update Product , delete Product
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { CreateProduct } from "./productValidation/route";
+import { CreateProduct, UpdateProduct } from "./productValidation/route";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/auth";
 
@@ -124,6 +124,56 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     return NextResponse.json({
+      error: err
+    });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ message: "Please login!" });
+  }
+  try {
+    const body = await request.json();
+
+    const result = UpdateProduct.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json({
+        message: "Invalid inputs",
+        error: result.error.errors
+      });
+    }
+
+    const response = await prisma.product.update({
+      where: {
+        id: body.productId
+      },
+      data: {
+        name: body.name !== "" ? body.name : undefined,
+        description: body.description !== "" ? body.description : undefined,
+        category: body.category !== "" ? body.category : undefined,
+        quantity: body.quantity !== 0 ? body.quantity : undefined,
+        price: body.price !== 0 ? body.price : undefined,
+        unit: body.unit !== "" ? body.unit : undefined,
+        country: body.country !== "" ? body.country : undefined,
+        productOrigin:
+          body.productOrigin !== "" ? body.productOrigin : undefined,
+        isAvailable:
+          body.isAvailable !== undefined ? body.isAvailable : undefined,
+        currency: body.currency !== "" ? body.currency : undefined
+      }
+    });
+
+    return NextResponse.json({
+      message : "success",
+      data: response
+    });
+  } catch (err) {
+    return NextResponse.json({
+      message: "Something went wrong",
       error: err
     });
   }

@@ -32,10 +32,10 @@ import { baseUrl } from "@/app/config";
 interface ProductsListProps {
   products: Product[];
   //   onUpdate: (updatedProduct: Product) => Promise<void>;
-  onDelete: (productId: string) => Promise<void>;
+  //   onDelete: (productId: string) => Promise<void>;
 }
 
-export function ProductsList({ products, onDelete }: ProductsListProps) {
+export function ProductsList({ products }: ProductsListProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -106,7 +106,13 @@ export function ProductsList({ products, onDelete }: ProductsListProps) {
 
     try {
       setIsLoading(true);
-      await onDelete(selectedProduct.id);
+      //   await onDelete(selectedProduct.id);
+      const response = await axios.delete(`${baseUrl}/product`, {
+        data: { id: selectedProduct.id },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setIsDeleteOpen(false);
       toast({
         title: "Product deleted",

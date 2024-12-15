@@ -8,11 +8,11 @@ import { SessionProvider } from "next-auth/react";
 // Dummy API functions - replace these with your actual API calls
 
 
-async function deleteProduct(productId: string): Promise<void> {
-  // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log("Delete product:", productId);
-}
+// async function deleteProduct(productId: string): Promise<void> {
+//   // Simulate API call
+//   await new Promise((resolve) => setTimeout(resolve, 1000));
+//   console.log("Delete product:", productId);
+// }
 
 export default function ProductsPage({ products }: { products: Product[] }) {
   // Your products data will be passed as a prop here
@@ -23,7 +23,6 @@ export default function ProductsPage({ products }: { products: Product[] }) {
       <SessionProvider>
         <ProductsList
           products={products}
-          onDelete={deleteProduct}
         />
         <Toaster />
       </SessionProvider>

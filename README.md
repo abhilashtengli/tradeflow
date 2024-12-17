@@ -106,6 +106,7 @@ Make sure you have the following installed:
 ├── styles/            # Global styles
 ├── public/            # Static assets
 └── .env               # Environment variables
+```
 
 ---
 

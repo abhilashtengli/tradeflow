@@ -18,6 +18,7 @@ With TradeFlow, users can:
 - **Role-Based Authentication**: Different user roles (Buyer, Seller, Transporter, Freight Forwarder) enable tailored access to features.
 - **Container Booking**: Sellers connect with freight forwarders to book vessel containers and manage shipments.
 - **Transport Coordination**: Sellers can assign transporters to deliver goods from the manufacturer to the port.
+- **Travel Distance Calculation**: Uses Google Maps API to calculate the travel distance between the manufacturer and port. Based on the distance, the commute price is automatically calculated.
 - **Secure APIs**: Routes are protected using middleware for enhanced security.
 - **User Authentication**: Secure user sign-up and sign-in with `NextAuth`.
 
@@ -30,6 +31,7 @@ With TradeFlow, users can:
 - **Backend**: API endpoints secured with middleware.
 - **Database**: PostgreSQL for reliable, structured data storage.
 - **Authentication**: [NextAuth](https://next-auth.js.org/) for secure authentication.
+- **Maps Integration**: Google Maps API for distance calculation.
 
 ---
 
@@ -41,11 +43,12 @@ Follow these steps to set up and run the project locally:
 Make sure you have the following installed:
 - [Node.js](https://nodejs.org/) (v14+)
 - [PostgreSQL](https://www.postgresql.org/)
+- A valid **Google Maps API Key**
 
 ### Setup
 1. **Clone the repository**:
    ```bash
-   git clone 
+   git clone https://github.com/yourusername/tradeflow.git
    cd tradeflow
    ```
 
@@ -60,6 +63,7 @@ Make sure you have the following installed:
    DATABASE_URL=your_postgresql_connection_string
    NEXTAUTH_URL=http://localhost:3000
    NEXTAUTH_SECRET=your_secret_key
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
    ```
 
 4. **Run database migrations**:
@@ -103,7 +107,6 @@ Make sure you have the following installed:
 ├── components/        # UI components built with V0 AI
 ├── middleware/        # Route security and API protection
 ├── lib/               # Database configurations (Prisma and PostgreSQL)
-├── styles/            # Global styles
 ├── public/            # Static assets
 └── .env               # Environment variables
 ```
@@ -127,11 +130,9 @@ Make sure you have the following installed:
 ## Contributing
 Contributions are welcome! If you'd like to contribute:
 1. Fork the repository.
-2. Create a new branch .
+2. Create a new branch.
 3. Commit your changes.
 4. Submit a pull request.
-
-
 
 ---
 

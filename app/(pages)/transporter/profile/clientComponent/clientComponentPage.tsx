@@ -12,6 +12,8 @@ interface Data {
   role: string;
   email: string;
   country: string;
+  companyName: string;
+  companyAddress: string;
 }
 
 export default function ClientComponentPage({ data }: { data: Data }) {
@@ -19,36 +21,44 @@ export default function ClientComponentPage({ data }: { data: Data }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState({
-    name: undefined,
-    email: undefined,
-    country: undefined,
-    password: undefined
+    name: data.name || "",
+    country: data.country || "",
+    password: "",
+    companyName: data.companyName || "",
+    companyAddress: data.companyAddress || ""
   });
+
   const { data: session } = useSession();
   const token = session?.accessToken;
-  
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
     setError("");
     setSuccess("");
     e.preventDefault();
     // Handle form submission
-    const updatedData = { ...formData };
-    console.log(updatedData);
+    const submissionData: Partial<typeof formData> = { ...formData };
+
+    if (!submissionData.password) {
+      delete submissionData.password; // Now TypeScript won't complain
+    }
 
     try {
-      const response = await axios.patch(`${baseUrl}/user`, updatedData, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.patch(
+        `${baseUrl}/usertransporter`,
+        submissionData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      });
+      );
       console.log(response.data);
+      setFormData({ ...formData, password: "" });
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
     }
-    console.log("Form submitted:", data);
   };
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +68,7 @@ export default function ClientComponentPage({ data }: { data: Data }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden border m-10">
+    <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden border m-5">
       <div className="h-48 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 relative">
         {/* <Image alt="banner" width="100" height="32" className="w-full h-full" src="" /> */}
       </div>
@@ -79,14 +89,12 @@ export default function ClientComponentPage({ data }: { data: Data }) {
             </h2>
             <p className="text-gray-600">{data.email}</p>
           </div>
-          <div className="mt-4 sm:mt-0">
-            <button className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-full shadow">
-              Copy profile link
-            </button>
+          <div className="mt-4 sm:mt-0 font-semibold text-zinc-700">
+            {data.companyName?.toUpperCase()}
           </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Name
@@ -100,19 +108,7 @@ export default function ClientComponentPage({ data }: { data: Data }) {
                 onChange={handleChange}
               />{" "}
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                placeholder={data.email}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                onChange={handleChange}
-              />{" "}
-            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
@@ -135,6 +131,32 @@ export default function ClientComponentPage({ data }: { data: Data }) {
                 name="country"
                 value={formData.country}
                 placeholder={data.country}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                onChange={handleChange}
+              />{" "}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company name
+              </label>
+              <input
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                placeholder={data.companyName}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                onChange={handleChange}
+              />{" "}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company address
+              </label>
+              <input
+                type="text"
+                name="companyAddress"
+                value={formData.companyAddress}
+                placeholder={data.companyAddress}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 onChange={handleChange}
               />{" "}

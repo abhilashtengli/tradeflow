@@ -1,6 +1,6 @@
 import { baseUrl } from "@/app/config";
-import ClientComponent from "./clientComponent/page";
 import { createAuthorizedAxios } from "@/lib/authHelper";
+import ClientComponent from "./clientComponent/page";
 
 export default async function page() {
   const api = await createAuthorizedAxios();

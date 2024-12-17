@@ -73,7 +73,7 @@ export const authOptions: NextAuthOptions = {
             id: userTs.id,
             name: userTs.name,
             email: userTs.email,
-            userRole: "transporter"
+            userRole: "Transporter"
           };
         }
 
@@ -87,7 +87,7 @@ export const authOptions: NextAuthOptions = {
             id: userFf.id,
             name: userFf.name,
             email: userFf.email,
-            userRole: "freightForwarder"
+            userRole: "FreightForwarder"
           };
         }
 

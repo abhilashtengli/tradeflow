@@ -100,9 +100,9 @@ export function FreightBookingForm({ onSubmit }: FreightBookingFormProps) {
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" ref={triggerRef}>
-          Freight Booking Details
+      <DialogTrigger asChild className="flex justify-end border ">
+        <Button ref={triggerRef} className="text-sm">
+          Add Booking 
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

@@ -41,6 +41,23 @@ export function FindForwarder({
   const { data: session } = useSession();
   const token = session?.accessToken;
 
+  const getBookings = async () => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/freight/freightBooking/getBookings/userBookings?`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      setBookingDetails(response.data.data);
+    } catch (err) {
+      console.log("Could not fetch bookings", err);
+    }
+  };
+
   const handleRequestQuote = (forwarderId: string) => {
     setSelectedForwarder(forwarderId);
     setIsRequestQuoteOpen(true);
@@ -85,12 +102,12 @@ export function FindForwarder({
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Find Forwarder</h1>
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="md:w-full space-y-4">
-          <SessionProvider>
+      <h1 className="text-2xl font-bold mb-4  w-fit">Find Forwarder</h1>
+      <div className="flex flex-col md:flex-row gap-4  ">
+        <div className="md:w-full space-y-4 border p-3 rounded-lg  border-gray-100  bg-gray-300 bg-opacity-15">
+          {/* <SessionProvider>
             <FreightBookingForm onSubmit={handleBookingSubmit} />
-          </SessionProvider>
+          </SessionProvider> */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {freightForwarders.map((forwarder) => (
               <FreightForwarderCard
@@ -101,12 +118,36 @@ export function FindForwarder({
             ))}
           </div>
         </div>
-        <div className="md:w-1/2 space-y-4">
+        <div className="md:w-1/2 space-y-4 border min-h-96 border-gray-100 rounded-lg bg-gray-300 bg-opacity-15 p-3">
+          <div className={`${bookingDetails.length === 0 ? "flex justify-center" : "flex justify-between items-center"}`}>
+            <h1 className="text-xl text-center font-semibold">
+              Freight Booking Details
+            </h1>
+            {bookingDetails.length !== 0 && (
+              <SessionProvider>
+                <FreightBookingForm onSubmit={handleBookingSubmit} />
+              </SessionProvider>
+            )}
+          </div>
+
+          {bookingDetails.length === 0 && (
+            <div className="grid place-content-center  xl:h-72 lg:h-72">
+              <div className="space-y-3 ">
+                <h1>There are no bookings</h1>
+                <div className="flex justify-center">
+
+                <SessionProvider>
+                  <FreightBookingForm onSubmit={handleBookingSubmit} />
+                </SessionProvider>
+                </div>
+              </div>
+            </div>
+          )}
           {bookingDetails.map((booking) => (
             <Card key={booking.id}>
               <CardHeader>
-                <CardTitle>Freight Booking Details</CardTitle>
-                <span className="text-sm ">Booking Id : {booking.id}</span>
+                {/* <CardTitle>Freight Booking Details</CardTitle> */}
+                <span className="text-xs ">Booking Id : {booking.id}</span>
               </CardHeader>
               <CardContent>
                 <p>

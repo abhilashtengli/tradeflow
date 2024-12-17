@@ -11,6 +11,7 @@ const page = async () => {
     const api = await createAuthorizedAxios();
     const response = await api.get(`${baseUrl}/product`);
     data = response.data.data;
+    console.log(response.data);
   } catch (err) {
     console.error("Error fetching products:", err);
     error = "Failed to fetch products. Please try again.";

@@ -27,6 +27,7 @@ export function RequestQuoteCard({ bookings, freightForwarderId, onConfirm }: Re
       </DialogHeader>
       <div className="py-4">
         <RadioGroup onValueChange={setSelectedBookingId} className="space-y-2">
+          {bookings.length === 0 && <div>There are no bookings, Please add <span className="font-semibold">Freight booking details</span></div>}
           {bookings.map((booking) => (
             <div key={booking.id} className="flex items-center space-x-2">
               <RadioGroupItem value={booking.id} id={booking.id} />

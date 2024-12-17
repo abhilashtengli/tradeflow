@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Package, Pencil, Trash2 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 import {
@@ -40,9 +40,22 @@ export function ProductsList({ products }: ProductsListProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [allProducts, setAllProducts] = useState(products);
   const { data: session } = useSession();
   const token = session?.accessToken;
 
+  const fetchProductData = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/product`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setAllProducts(response.data.data);
+    } catch (err) {
+      console.error("Could not fetch product data", err);
+    }
+  };
   const handleEdit = async (product: Product) => {
     setSelectedProduct(product);
     //   console.log("Edit", product);
@@ -80,6 +93,7 @@ export function ProductsList({ products }: ProductsListProps) {
         }
       });
       if (response.data.message === "success") {
+        fetchProductData();
         setIsEditOpen(false);
         toast({
           title: "Product updated",
@@ -113,11 +127,17 @@ export function ProductsList({ products }: ProductsListProps) {
           Authorization: `Bearer ${token}`
         }
       });
-      setIsDeleteOpen(false);
-      toast({
-        title: "Product deleted",
-        description: "The product has been deleted successfully."
-      });
+      console.log(response.data);
+
+      if (response.data.message === "success") {
+        fetchProductData();
+        setIsDeleteOpen(false);
+        toast({
+          title: "Product deleted",
+          description: "The product has been deleted successfully."
+        });
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast({
@@ -133,61 +153,68 @@ export function ProductsList({ products }: ProductsListProps) {
 
   return (
     <div className="container mx-auto p-6">
+      {allProducts.length === 0 && (
+        <div className=" w-full h-[70vh] flex items-center text-xl justify-center text-zinc-500">
+          <Package className="mr-2 h-4 w-4" />
+          Please add your products
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <Card key={product.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">
-                {product.name}
-              </CardTitle>
-              <CardDescription>{product.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Category:</span>
-                  <span className="font-medium">{product.category}</span>
+        {allProducts.length > 0 &&
+          allProducts.map((product) => (
+            <Card key={product.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">
+                  {product.name}
+                </CardTitle>
+                <CardDescription>{product.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <div className="space-y-2 text-sm flex flex-col justify-end h-full">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Category:</span>
+                    <span className="font-medium">{product.category}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Quantity:</span>
+                    <span className="font-medium">
+                      {product.quantity} {product.unit}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Price:</span>
+                    <span className="font-medium">
+                      {product.currency} {product.price} / {product.unit}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Origin:</span>
+                    <span className="font-medium">
+                      {product.productOrigin}, {product.country}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Quantity:</span>
-                  <span className="font-medium">
-                    {product.quantity} {product.unit}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Price:</span>
-                  <span className="font-medium">
-                    {product.currency} {product.price} / {product.unit}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Origin:</span>
-                  <span className="font-medium">
-                    {product.productOrigin}, {product.country}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleEdit(product)}
-              >
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleDelete(product)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+              </CardContent>
+              <CardFooter className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEdit(product)}
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDelete(product)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
       </div>
 
       <EditProductDialog

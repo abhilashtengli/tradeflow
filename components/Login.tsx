@@ -1,5 +1,10 @@
 "use client";
 
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -10,81 +15,125 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { redirect } from "next/navigation";
-import axios from "axios";
-const Login = () => {
+import { Loader2 } from 'lucide-react';
+
+export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await signIn("credentials", {
-      redirect: false,
-      email,
-      password
-    });
-    const { data } = await axios.post("/api/getUserRole", { email });
-    const userRole = data.role;
+    setIsLoading(true);
+    setError(null);
 
-    if (res?.error) {
-      setError(res.error);
-    } else {
-      if (userRole === "Buyer") {
-        redirect("/buyer/dashboard");
-      } else if (userRole === "Seller") {
-        redirect("/seller/dashboard");
-      } else if (userRole === "Transporter") {
-        redirect("/transporter/tsdashboard");
-      } else if (userRole === "FreightForwarder") {
-        redirect("/freightForwarder/quotation");
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password
+      });
+
+      if (res?.error) {
+        setError("Invalid credentials. Please try again.");
+        setIsLoading(false);
+        return;
       }
+
+      const { data } = await axios.post("/api/getUserRole", { email });
+      const userRole = data.role;
+
+      switch (userRole) {
+        case "Buyer":
+          router.push("/buyer/dashboard");
+          break;
+        case "Seller":
+          router.push("/seller/dashboard");
+          break;
+        case "Transporter":
+          router.push("/transporter/tsdashboard");
+          break;
+        case "FreightForwarder":
+          router.push("/freightForwarder/quotation");
+          break;
+        default:
+          setError("Unknown user role. Please contact support.");
+          setIsLoading(false);
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+      setIsLoading(false);
     }
   };
+
   return (
-    <div className="">
-      <Card>
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">Sign In</CardTitle>
-          <CardDescription />
+          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
+          <CardDescription className="text-center text-gray-600">
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-            <Input
-              placeholder="Email"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-              placeholder="Password"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            {error && (
+              <p className="text-sm text-red-600 text-center">{error}</p>
+            )}
             <Button
-              variant="outline"
               type="submit"
-              className="bg-black text-gray-300"
+              className="w-full bg-black text-white hover:bg-gray-800"
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col gap-3">
-          <span>Or</span>
-          <form>
-            <Button variant="outline" type="submit">
-              Sign In with Google
-            </Button>
-          </form>
-          <Link href="/signup">Dont have a account? Sign Up</Link>
+        <CardFooter className="flex flex-col items-center space-y-4">
+          
+          <Link href="/signup" className="text-sm text-blue-600 hover:underline">
+            Don't have an account? Sign Up
+          </Link>
         </CardFooter>
       </Card>
     </div>
   );
-};
+}
 
-export default Login;

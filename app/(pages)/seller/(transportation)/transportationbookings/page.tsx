@@ -3,11 +3,13 @@ import axios from "axios";
 import React from "react";
 import BookingsPage from "./BookingsPage/BookingsPage";
 import ClientB from "./ClientBookingPage/ClientB";
+import { createAuthorizedAxios } from "@/lib/authHelper";
 
 const page = async () => {
   let data = [];
   try {
-    const response = await axios.get(
+    const api = await createAuthorizedAxios();
+    const response = await api.get(
       `${baseUrl}/transportation/userInput/getBookings`
     );
     data = response.data.data;

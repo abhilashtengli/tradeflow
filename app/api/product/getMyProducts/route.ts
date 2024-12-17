@@ -1,13 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import authOptions from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import authOptions from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-//get all my products which  I have posted
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     // const userId = request.headers.get("x-user-id") as string;

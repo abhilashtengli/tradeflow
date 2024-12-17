@@ -13,6 +13,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     const api = await createAuthorizedAxios();
     const response = await api.get(`${baseUrl}/usertransporter/user`);
     data = response.data.data;
+    console.log(response.data);
   } catch (err) {
     console.log(err);
   }
@@ -24,7 +25,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate">
-              Transporter Dashboard
+              Transporter 
             </h2>
             <div className="flex items-center">
               <Button variant="ghost" size="icon" className="ml-4">
@@ -34,7 +35,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
         </header>
-        <SessionProvider>{children}</SessionProvider>   
+        {children}
         <Toaster />
       </main>
     </div>

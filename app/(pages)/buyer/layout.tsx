@@ -17,6 +17,8 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
   } catch (err) {
     console.log(err);
   }
+
+  
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -24,7 +26,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate">
-              Buyer Dashboard
+              Buyer 
             </h2>
             <div className="flex items-center">
               <SearchBar />

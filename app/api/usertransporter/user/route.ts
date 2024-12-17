@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     // const id = (await request.headers.get("x-user-id")) as string;
 
     const session = await getServerSession(authOptions);
-
+    console.log(session);
+    
     if (!session) {
       return NextResponse.json({
         message: "Please login!"

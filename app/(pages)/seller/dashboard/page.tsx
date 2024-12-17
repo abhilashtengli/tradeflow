@@ -9,10 +9,9 @@ export default async function getProducts() {
   const api = await createAuthorizedAxios();
 
   const response = await api.get(`${baseUrl}/product/getMyProducts`);
-  
+
   products = response.data.data;
   console.log(products);
-  
 
   return (
     <>

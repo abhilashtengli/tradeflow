@@ -101,11 +101,11 @@ export async function DELETE(request: NextRequest) {
       }
     });
     return NextResponse.json({
-      message: "Product deleted successfully"
+      message: "success"
     });
   } catch (err) {
     return NextResponse.json({
-      error: err
+      error: err || "An unknown error occurred"
     });
   }
 }
@@ -114,6 +114,12 @@ export async function DELETE(request: NextRequest) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   console.log("reached");
+
+  const session = getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ message: "Please login!" });
+  }
 
   try {
     const products = await prisma.product.findMany();
@@ -168,7 +174,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     return NextResponse.json({
-      message : "success",
+      message: "success",
       data: response
     });
   } catch (err) {

@@ -9,7 +9,14 @@ const allowedRoutes = {
   Transporter: ["/transporter", "/api"]
 };
 
-const publicPaths = ["/signin", "/signup", "/api/auth", "/api/getUserRole"];
+const publicPaths = [
+  "/",
+  "/signin",
+  "/signup",
+  "/Home",
+  "/api/auth",
+  "/api/getUserRole"
+];
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;

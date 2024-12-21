@@ -13,6 +13,7 @@ const layout = async ({ children }: { children: React.ReactNode }) => {
     const api = await createAuthorizedAxios();
     const response = await api.get(`${baseUrl}/freight/freightForwarder`);
     data = response.data.data;
+    console.log("Profiledata", data);
   } catch (err) {
     console.log(err);
   }

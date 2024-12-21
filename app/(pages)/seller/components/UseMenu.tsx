@@ -28,7 +28,7 @@ export function UserMenu({ data }: { data: User }) {
 
   const handleProfileClick = () => {
     setIsOpen(false);
-    router.push("/freightForwarder/profile");
+    router.push("/seller/profile");
   };
 
   const handleLogout = () => {

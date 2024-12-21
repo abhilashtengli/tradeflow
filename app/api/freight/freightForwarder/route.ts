@@ -18,7 +18,7 @@ export async function PATCH(request: NextRequest) {
   try {
     // const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
     const session = await getServerSession(authOptions);
-
+    
     if (!session) {
       return NextResponse.json({ message: "Please login!" });
     }
@@ -63,18 +63,23 @@ export async function GET(request: NextRequest) {
     // const userId = "8125bff5-ff56-4e62-872b-5ff4c13e34ff";
 
     const session = await getServerSession(authOptions);
+        console.log("Session", session);
 
     if (!session) {
       return NextResponse.json({ message: "Please login!" });
     }
 
     const userId = session?.user.id;
-
+    console.log("UserId : ", userId);
+    
     const response = await prisma.freightForwarder.findUnique({
       where: {
         id: userId
       }
     });
+
+    console.log("Response : ", response);
+    
     return NextResponse.json({
       data: response
     });

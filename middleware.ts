@@ -10,7 +10,6 @@ const allowedRoutes = {
 };
 
 const publicPaths = [
-  "/",
   "/signin",
   "/signup",
   "/Home",
